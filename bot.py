@@ -51,4 +51,12 @@ async def on_raw_reaction_add(payload):
         await ctx.send("Message pinned")
 
 
+async def on_raw_reaction_add(payload):
+    if payload.emoji.name == "📌":
+        msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+        await msg.unpin()
+        ctx = await bot.get_context(msg)
+        await ctx.send("Message unpinned")
+
+
 bot.run(TOKEN)
