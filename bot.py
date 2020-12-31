@@ -50,7 +50,7 @@ async def on_raw_reaction_add(payload):
         ctx = await bot.get_context(msg)
         await ctx.send("Message pinned")
 
-
+@bot.event
 async def on_raw_reaction_remove(payload):
     if payload.emoji.name == "📌":
         print("emoji_removed")
