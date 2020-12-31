@@ -16,6 +16,12 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 
 makedb(conn)
+cur = conn.cursor()
+
+cur.execute("SELECT NUM, LANG, QUOT, TRAN from inter")
+rows = cur.fetchall()
+for j in rows:
+    print(j)
 
 filldb(conn)
 
