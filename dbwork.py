@@ -86,6 +86,7 @@ def removelast(conn):
     a = int(str(cur.fetchone())[1:-2])
     print(a)
     cur.execute("DELETE FROM inter WHERE NUM = %s;", ([a]))
+    conn.commit()
     cur.execute("SELECT NUM, QUOT, TRAN from inter")
     rows = cur.fetchall()
     for j in rows:
