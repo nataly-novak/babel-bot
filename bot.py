@@ -28,19 +28,21 @@ bot = commands.Bot(command_prefix='/')
 @bot.command(name='quote', help = "generates random quotes with translation", pass_context=True)
 async def cookin(ctx):
     response = randomquote(conn)
-    await ctx.send(response)
     await ctx.message.delete()
+    await ctx.send(response)
+
 
 
 
 @bot.command(name='add' , help='Adds a quote. Use quotes around both quote and translation', pass_context=True)
 async def itl(ctx,language, line, trans =""):
-    addquote(conn,language,line,trans)
     await ctx.message.delete()
+    addquote(conn,language,line,trans)
+
 
 @bot.command(name='del' , help='deletes last quote', pass_context=True)
 async def de(ctx):
-    removelast(conn)
     await ctx.message.delete()
+    removelast(conn)
 
 bot.run(TOKEN)
