@@ -43,9 +43,10 @@ async def de(ctx):
 
 
 @bot.event
-async def on_reaction_add(ctx, reaction, user):
+async def on_reaction_add(reaction, user):
     if reaction.emoji == "📌":
         await reaction.message.pin()
+        ctx = await bot.get_context(reaction)
         await ctx.send("Message pinned")
 
 
