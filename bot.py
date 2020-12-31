@@ -14,35 +14,39 @@ DATABASE_URL = os.environ['DATABASE_URL']
 
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
-
 makedb(conn)
 
 filldb(conn)
-
 
 TOKEN = os.getenv('TOKEN')
 
 bot = commands.Bot(command_prefix='/')
 
 
-@bot.command(name='quote', help = "generates random quotes with translation", pass_context=True)
+@bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
 async def cookin(ctx):
     response = randomquote(conn)
     await ctx.message.delete()
     await ctx.send(response)
 
 
-
-
-@bot.command(name='add' , help='Adds a quote. Use quotes around both quote and translation', pass_context=True)
-async def itl(ctx,language, line, trans =""):
+@bot.command(name='add', help='Adds a quote. Use quotes around both quote and translation', pass_context=True)
+async def itl(ctx, language, line, trans=""):
     await ctx.message.delete()
-    addquote(conn,language,line,trans)
+    addquote(conn, language, line, trans)
 
 
-@bot.command(name='del' , help='deletes last quote', pass_context=True)
+@bot.command(name='del', help='deletes last quote', pass_context=True)
 async def de(ctx):
     await ctx.message.delete()
     removelast(conn)
+
+
+@bot.event
+async def on_reaction_add(ctx, reaction, user):
+    if reaction.emoji == "📌":
+        await reaction.message.pin()
+        await ctx.send("Message pinned")
+
 
 bot.run(TOKEN)
