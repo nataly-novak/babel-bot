@@ -53,6 +53,7 @@ async def on_raw_reaction_add(payload):
 
 async def on_raw_reaction_remove(payload):
     if payload.emoji.name == "📌":
+        print("emoji_removed")
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.unpin()
         ctx = await bot.get_context(msg)
