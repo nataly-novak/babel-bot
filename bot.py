@@ -20,7 +20,7 @@ makedb(conn)
 filldb(conn)
 
 
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv('TOKEN')
 
 bot = commands.Bot(command_prefix='/')
 
