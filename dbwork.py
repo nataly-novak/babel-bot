@@ -118,11 +118,12 @@ def checksetting(conn, setting, value):
     print(line0)
     cur.execute(line0)
     a = str(cur.fetchone())
-    print(a)
+    print("="+a+"=")
     b = a[1:-1].split(', ')[1]
     c = b[1:-1]
     print(c)
     if a.rstrip() != 'None':
+        print(a)
         leng = len(c)
         v = ''
         for i in range(leng):
