@@ -84,7 +84,7 @@ def addsetting(conn, setting, value):
 
 def removesetting(conn, setting, value):
     cur = conn.cursor()
-    line0 = "SELECT DATALENGTH(VAL) AS FIELDSIZE FROM "+setting
+    line0 = "SELECT LENGTH(VAL) AS FIELDSIZE FROM "+setting
     cur.execute(line0)
     a = str(cur.fetchone())
     leng = int(a[1:-2])
