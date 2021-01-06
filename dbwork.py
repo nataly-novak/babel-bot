@@ -63,16 +63,20 @@ def filldb(conn):
 
 def addsetting(conn, setting, value):
     cur = conn.cursor()
-    cur.execute("SELECT MAX(NMB) FROM %s;",(setting, ))
+    line0 = "SELECT MAX(NMB) FROM "+setting
+    cur.execute(line0)
     a = str(cur.fetchone())
     print(a)
     if a == '(None,)':
         ar = '0'
     else:
         ar = str(int(a[1:-2]) + 1)
+    line1 = "INSERT INTO "+ setting + " VALUES ("+ar+","+value+")"
+    print(line1)
 
-    cur.execute("INSERT INTO %s VALUES (%s,%s)", (setting,ar, value))
-    cur.execute("SELECT NMB, VAL from %s",(setting, ))
+    cur.execute(line1)
+    line2 = "SELECT NMB, VAL from "+setting
+    cur.execute(line2)
     rows = cur.fetchall()
     for j in rows:
         print(j)
