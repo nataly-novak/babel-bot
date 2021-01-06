@@ -129,11 +129,13 @@ def checksetting(conn, setting, value):
             else:
                 v += ' '
         print("-"+v+"-")
-    line1 = "SELECT NUM FROM "+setting+" WHERE VAL = "+v
-    cur.execute(line1)
-    a = str(cur.fetchone())
-    if a != '(None,)':
-        return True
+        line1 = "SELECT NUM FROM "+setting+" WHERE VAL = "+v
+        cur.execute(line1)
+        a = str(cur.fetchone())
+        if a != '(None,)':
+            return True
+        else:
+            return False
     else:
         return False
 
