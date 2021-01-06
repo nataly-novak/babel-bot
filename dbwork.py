@@ -73,6 +73,7 @@ def addsetting(conn, setting, value):
         ar = str(int(a[1:-2]) + 1)
     line1 = "INSERT INTO "+ setting + " VALUES ("+ar+","+value+")"
     print(line1)
+    conn.commit()
 
     cur.execute(line1)
     line2 = "SELECT NMB, VAL from "+setting
@@ -84,13 +85,15 @@ def addsetting(conn, setting, value):
 
 def removesetting(conn, setting, value):
     cur = conn.cursor()
-    line0 = "SELECT character_maximum_length FROM information_schema.columns WHERE table_name = \'"+setting+"\'"
+    line0 = "SELECT * FROM "setting" FETCH FIRST ROW ONLY;"
     print(line0)
     cur.execute(line0)
     a = str(cur.fetchone())
-    print(a)
+    b = a[1,-1].split(', ')[1]
+    c = b[1,-1]
+    print(c)
     if a != '(None,)':
-        leng = int(a[1:-2])
+        leng = int(c)
         v = ''
         for i in range(leng):
             if i<len(str(value)):
@@ -106,6 +109,8 @@ def removesetting(conn, setting, value):
         rows = cur.fetchall()
         for j in rows:
             print(j)
+    conn.commit()
+
 
 
 
