@@ -111,7 +111,31 @@ def removesetting(conn, setting, value):
             print(j)
     conn.commit()
 
-
+def checksetting(conn, setting, value):
+    cur = conn.cursor()
+    line0 = "SELECT * FROM " + setting + " FETCH FIRST ROW ONLY;"
+    print(line0)
+    cur.execute(line0)
+    a = str(cur.fetchone())
+    b = a[1:-1].split(', ')[1]
+    c = b[1:-1]
+    print(c)
+    if a != '(None,)':
+        leng = len(c)
+        v = ''
+        for i in range(leng):
+            if i < len(str(value)):
+                v += str(value)[i]
+            else:
+                v += ' '
+        print("-"+v+"-")
+    line1 = "SELECT NUM FROM "+setting+" WHERE VAL = "+v
+    cur.execute(line1)
+    a = str(cur.fetchone())
+    if a != '(None,)':
+        return True
+    else:
+        return False
 
 
 def randomquote(conn):

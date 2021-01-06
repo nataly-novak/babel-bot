@@ -3,7 +3,7 @@ import random
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting
+from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting
 
 import os
 import psycopg2
@@ -60,10 +60,14 @@ async def setpin(ctx):
     chan = ctx.channel.id
     print(chan)
     removesetting(conn,'settingspins',str(chan))
+    await ctx.message.delete()
+
 
 
 @bot.event
 async def on_raw_reaction_add(payload):
+    chan = bot.get_channel(payload.channel_id)
+    print(checksetting(chan))
     if payload.emoji.name == "📌":
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.pin()
