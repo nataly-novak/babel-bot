@@ -11,7 +11,7 @@ def settingsdb(conn):
     if not check:
         cur.execute('''CREATE TABLE settingspins (
             NMB INT NOT NULL,
-            VAL INT NOT NULL
+            VAL BIGINTINT NOT NULL
             );''')
         print("Table created successfully")
         cur.execute('ALTER TABLE settingspins ADD CONSTRAINT test_pkey2 PRIMARY KEY (NMB);')
