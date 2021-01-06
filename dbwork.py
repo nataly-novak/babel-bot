@@ -14,7 +14,7 @@ def settingsdb(conn):
             VAL CHAR(20) NOT NULL
             );''')
         print("Table created successfully")
-        cur.execute('ALTER TABLE settingspins ADD CONSTRAINT test_pkey2 PRIMARY KEY (NMB);')
+        cur.execute('ALTER TABLE settingspins ADD CONSTRAINT test_pkey2 PRIMARY KEY (VAL);')
     else:
         print('No need')
         conn.commit()
@@ -71,7 +71,7 @@ def addsetting(conn, setting, value):
         ar = '0'
     else:
         ar = str(int(a[1:-2]) + 1)
-    line1 = "INSERT INTO "+ setting + " VALUES ("+ar+","+value+")"
+    line1 = "INSERT INTO "+ setting + " VALUES ("+ar+","+value+") ON CONFLICT (VAL) DO NOTHING"
     print(line1)
     conn.commit()
 
