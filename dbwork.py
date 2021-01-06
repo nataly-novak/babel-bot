@@ -122,7 +122,7 @@ def checksetting(conn, setting, value):
     b = a[1:-1].split(', ')[1]
     c = b[1:-1]
     print(c)
-    if a != '(None,)':
+    if a != 'None':
         leng = len(c)
         v = ''
         for i in range(leng):
@@ -131,7 +131,7 @@ def checksetting(conn, setting, value):
             else:
                 v += ' '
         print("-"+v+"-")
-        line1 = "SELECT NMB FROM "+setting+" WHERE VAL = "+v
+        line1 = "SELECT NMB FROM "+setting+" WHERE VAL = \'"+v+"\'"
         cur.execute(line1)
         a = str(cur.fetchone())
         if a != '(None,)':
