@@ -93,7 +93,7 @@ def removesetting(conn, setting, value):
     c = b[1:-1]
     print(c)
     if a != '(None,)':
-        leng = int(c)
+        leng = len(c)
         v = ''
         for i in range(leng):
             if i<len(str(value)):
