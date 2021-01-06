@@ -84,27 +84,28 @@ def addsetting(conn, setting, value):
 
 def removesetting(conn, setting, value):
     cur = conn.cursor()
-    line0 = "SELECT * FROM "+setting+" FETCH FIRST ROW ONLY;"
+    line0 = "SELECT character_maximum_length FROM information_schema.columns WHERE table_name = \'"+setting+"\'"
     print(line0)
     cur.execute(line0)
     a = str(cur.fetchone())
     print(a)
-    leng = int(a[1:-2])
-    v = ''
-    for i in range(leng):
-        if i<len(str(value)):
-            v+=str(value)[i]
-        else:
-            v+=' '
-    print(v)
-    line1 = "DELETE FROM "+setting+" WHERE VAL = \'"+value+"\'"
-    print(line1)
-    cur.execute(line1)
-    line2 = "SELECT NMB, VAL from " + setting
-    cur.execute(line2)
-    rows = cur.fetchall()
-    for j in rows:
-        print(j)
+    if a != '(None,)':
+        leng = int(a[1:-2])
+        v = ''
+        for i in range(leng):
+            if i<len(str(value)):
+                v+=str(value)[i]
+            else:
+                v+=' '
+        print(v)
+        line1 = "DELETE FROM "+setting+" WHERE VAL = \'"+value+"\'"
+        print(line1)
+        cur.execute(line1)
+        line2 = "SELECT NMB, VAL from " + setting
+        cur.execute(line2)
+        rows = cur.fetchall()
+        for j in rows:
+            print(j)
 
 
 
