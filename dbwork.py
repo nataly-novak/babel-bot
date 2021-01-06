@@ -82,6 +82,30 @@ def addsetting(conn, setting, value):
         print(j)
 
 
+def removesetting(conn, setting, value):
+    cur = conn.cursor
+    line0 = "SELECT DATALENGTH(VAL) AS FIELDSIZE FROM "+setting+";"
+    cur.execute(line0)
+    a = str(cur.fetchone())
+    leng = int(a[1:-2])
+    v = ''
+    for i in range(leng):
+        if i<len(str(value)):
+            v+=str(value)[i]
+        else:
+            v+=' '
+    print(v)
+    line1 = "DELETE FROM "+setting+" WHERE VAL = \'"+value+"\';"
+    print(line1)
+    cur.execute(line1)
+    line2 = "SELECT NMB, VAL from " + setting
+    cur.execute(line2)
+    rows = cur.fetchall()
+    for j in rows:
+        print(j)
+
+
+
 def randomquote(conn):
     cur = conn.cursor()
     cur.execute("SELECT MAX(NUM) FROM inter;")

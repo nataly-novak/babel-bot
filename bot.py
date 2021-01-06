@@ -3,7 +3,7 @@ import random
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting
+from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting
 
 import os
 import psycopg2
@@ -51,6 +51,15 @@ async def setpin(ctx):
     chan = ctx.channel.id
     print(chan)
     addsetting(conn,'settingspins',str(chan))
+    await ctx.message.delete()
+
+
+@bot.command(name='delpin', help='rmoves the channel for from pin command list', pass_context=True)
+@commands.has_role(ADMIN_ROLE)
+async def setpin(ctx):
+    chan = ctx.channel.id
+    print(chan)
+    removesetting(conn,'settingspins',str(chan))
 
 
 @bot.event
