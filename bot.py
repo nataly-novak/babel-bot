@@ -44,7 +44,7 @@ async def de(ctx):
     removelast(conn)
 
 @bot.command(name='setpin', help='sets the channel for pins', pass_context=True)
-@commands.has_role('me')
+@commands.has_role('ADMIN_ROLE')
 async def setpin(ctx):
     chan = ctx.channel.id
     print(chan)
