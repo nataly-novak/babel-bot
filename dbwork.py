@@ -85,7 +85,7 @@ def addsetting(conn, setting, value):
 
 def removesetting(conn, setting, value):
     cur = conn.cursor()
-    line0 = "SELECT * FROM "setting" FETCH FIRST ROW ONLY;"
+    line0 = "SELECT * FROM "+setting+" FETCH FIRST ROW ONLY;"
     print(line0)
     cur.execute(line0)
     a = str(cur.fetchone())
