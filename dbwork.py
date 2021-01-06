@@ -73,7 +73,6 @@ def addsetting(conn, setting, value):
         ar = str(int(a[1:-2]) + 1)
     line1 = "INSERT INTO "+ setting + " VALUES ("+ar+","+value+") ON CONFLICT (VAL) DO NOTHING"
     print(line1)
-    conn.commit()
 
     cur.execute(line1)
     line2 = "SELECT NMB, VAL from "+setting
@@ -81,6 +80,8 @@ def addsetting(conn, setting, value):
     rows = cur.fetchall()
     for j in rows:
         print(j)
+    conn.commit()
+
 
 
 def removesetting(conn, setting, value):
@@ -117,6 +118,7 @@ def checksetting(conn, setting, value):
     print(line0)
     cur.execute(line0)
     a = str(cur.fetchone())
+    print(a)
     b = a[1:-1].split(', ')[1]
     c = b[1:-1]
     print(c)
@@ -129,7 +131,7 @@ def checksetting(conn, setting, value):
             else:
                 v += ' '
         print("-"+v+"-")
-        line1 = "SELECT NUM FROM "+setting+" WHERE VAL = "+v
+        line1 = "SELECT NMB FROM "+setting+" WHERE VAL = "+v
         cur.execute(line1)
         a = str(cur.fetchone())
         if a != '(None,)':
