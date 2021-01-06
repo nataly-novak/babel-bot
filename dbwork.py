@@ -9,7 +9,7 @@ def settingsdb(conn):
     check = (cur.fetchone()[0])
     print(check)
     if not check:
-        cur.execute('''CREATE TABLE settings (
+        cur.execute('''CREATE TABLE settingspins (
             NMB CHAR (30) NOT NULL,
             VAL CHAR(100)  NOT NULL
             );''')
