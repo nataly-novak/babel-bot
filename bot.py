@@ -54,7 +54,7 @@ async def setpin(ctx):
     await ctx.message.delete()
 
 
-@bot.command(name='delpin', help='rmoves the channel for from pin command list', pass_context=True)
+@bot.command(name='delpin', help='removes the channel for from pin command list', pass_context=True)
 @commands.has_role(ADMIN_ROLE)
 async def setpin(ctx):
     chan = ctx.channel.id
