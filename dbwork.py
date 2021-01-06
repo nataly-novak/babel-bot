@@ -67,9 +67,9 @@ def addsetting(conn, setting, value):
     a = str(cur.fetchone())
     print(a)
     if a == '(None,)':
-        ar = 0
+        ar = '0'
     else:
-        ar = int(a[1:-2]) + 1
+        ar = str(int(a[1:-2]) + 1)
 
     cur.execute("INSERT INTO %s VALUES (%s,%s)", (setting,ar, value))
     cur.execute("SELECT NMB, VAL from %s",(setting))

@@ -50,7 +50,7 @@ async def de(ctx):
 async def setpin(ctx):
     chan = ctx.channel.id
     print(chan)
-    addsetting(conn,'settingspins',chan)
+    addsetting(conn,'settingspins',str(chan))
 
 
 @bot.event
