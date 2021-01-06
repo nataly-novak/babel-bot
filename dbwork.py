@@ -84,7 +84,7 @@ def addsetting(conn, setting, value):
 
 def removesetting(conn, setting, value):
     cur = conn.cursor()
-    line0 = "SELECT LENGTH(VAL) AS FIELDSIZE FROM "+setting
+    line0 = "SELECT character_maximum_length FROM information_schema.columns WHERE table_name = \'"+setting+"\'"
     cur.execute(line0)
     a = str(cur.fetchone())
     print(a)
