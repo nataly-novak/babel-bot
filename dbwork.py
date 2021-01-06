@@ -87,6 +87,7 @@ def removesetting(conn, setting, value):
     line0 = "SELECT LENGTH(VAL) AS FIELDSIZE FROM "+setting
     cur.execute(line0)
     a = str(cur.fetchone())
+    print(a)
     leng = int(a[1:-2])
     v = ''
     for i in range(leng):
