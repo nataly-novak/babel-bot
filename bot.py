@@ -68,7 +68,7 @@ async def setpin(ctx):
 async def on_raw_reaction_add(payload):
     chan = payload.channel_id
     print(checksetting(conn,'settingspins', chan))
-    if payload.emoji.name == "📌":
+    if checksetting(conn,'settingspins', chan) and payload.emoji.name == "📌":
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.pin()
         ctx = await bot.get_context(msg)
@@ -76,7 +76,8 @@ async def on_raw_reaction_add(payload):
 
 @bot.event
 async def on_raw_reaction_remove(payload):
-    if payload.emoji.name == "📌":
+    chan = payload.channel_id
+    if checksetting(conn,'settingspins', chan) and payload.emoji.name == "📌":
         print("emoji_removed")
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.unpin()
