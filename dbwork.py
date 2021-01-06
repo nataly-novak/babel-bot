@@ -2,6 +2,24 @@ import os
 import psycopg2
 import random
 
+def settingsdb(conn):
+    cur = conn.cursor()
+    print('settingsdb')
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('settingspins',))
+    check = (cur.fetchone()[0])
+    print(check)
+    if not check:
+        cur.execute('''CREATE TABLE settings (
+            NMB CHAR (30) NOT NULL,
+            VAL CHAR(100)  NOT NULL
+            );''')
+        print("Table created successfully")
+        cur.execute('ALTER TABLE settingspins ADD CONSTRAINT test_pkey2 PRIMARY KEY (NMB);')
+    else:
+        print('No need')
+        conn.commit()
+
+
 def makedb(conn):
     cur = conn.cursor()
 
@@ -42,6 +60,22 @@ def filldb(conn):
     n = len(f1)
     print(n)
     f.close()
+
+def addsetting(conn, setting, value):
+    cur = conn.cursor()
+    cur.execute("SELECT MAX(NMB) FROM %s;",(setting))
+    a = str(cur.fetchone())
+    print(a)
+    if a == '(None,)':
+        ar = 0
+    else:
+        ar = int(a[1:-2]) + 1
+
+    cur.execute("INSERT INTO %s VALUES (%s,%s)", (setting,ar, value))
+    cur.execute("SELECT NMB, VAL from %s",(setting))
+    rows = cur.fetchall()
+    for j in rows:
+        print(j)
 
 
 def randomquote(conn):

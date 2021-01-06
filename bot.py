@@ -3,7 +3,7 @@ import random
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from dbwork import makedb, filldb, randomquote, removelast, addquote
+from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting
 
 import os
 import psycopg2
@@ -13,6 +13,8 @@ load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+settingsdb(conn)
 
 makedb(conn)
 
@@ -41,6 +43,13 @@ async def de(ctx):
     await ctx.message.delete()
     removelast(conn)
 
+@bot.command(name='setpin', help='sets the channel for pins', pass_context=True)
+@commands.has_role('ADMIN_ROLE')
+async def setpin(ctx):
+    chan = ctx.channel.id
+    print(chan)
+    addsetting(conn,'settingspins',chan)
+
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -58,6 +67,7 @@ async def on_raw_reaction_remove(payload):
         await msg.unpin()
         ctx = await bot.get_context(msg)
         await ctx.send("Message unpinned")
+
 
 
 bot.run(TOKEN)
