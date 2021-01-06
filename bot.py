@@ -24,6 +24,8 @@ TOKEN = os.getenv('TOKEN')
 
 bot = commands.Bot(command_prefix='/')
 
+ADMIN_ROLE = os.getenv('ADMIN_ROLE')
+
 
 @bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
 async def cookin(ctx):
@@ -44,7 +46,7 @@ async def de(ctx):
     removelast(conn)
 
 @bot.command(name='setpin', help='sets the channel for pins', pass_context=True)
-@commands.has_role('ADMIN_ROLE')
+@commands.has_role(ADMIN_ROLE)
 async def setpin(ctx):
     chan = ctx.channel.id
     print(chan)
