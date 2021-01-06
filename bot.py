@@ -66,7 +66,7 @@ async def setpin(ctx):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    chan = bot.get_channel(payload.channel_id)
+    chan = payload.channel_id
     print(checksetting(conn,'settingspins', chan))
     if payload.emoji.name == "📌":
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
