@@ -1,7 +1,7 @@
-discussion = {'english': ':flag_gb:', 'japanese': ':flag_jp:', 'spanish': ':flag_es:', 'french': ':flag_fr:',
-              'german': ':flag_de:', 'arabic': ':ArabLanguage:', 'mandarin': ':flag_cn: '}
-quest = {"I will master": ":crossed_swords:"}
-accountability = {"pom": ":tomato:"}
+discussion = {'english': '🇬🇧', 'japanese': '🇯🇵', 'spanish': '🇯🇵', 'french': '🇯🇵',
+              'german': '🇯🇵', 'arabic': ':ArabLanguage:', 'mandarin': '🇨🇳'}
+quest = {"I will master": "⚔"}
+accountability = {"pom": "🍅"}
 
 from dbwork import checksetting
 

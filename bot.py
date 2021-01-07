@@ -111,16 +111,16 @@ async def on_message(message):
     emo = getreaction(conn,line,chan)
     for i in emo:
         print(i)
-        em = i[1:-1]
-        emoji = get(bot.emojis, name=em)
-        if emoji:
-            await message.add_reaction(emoji)
+        if em[:1] == ':':
+            em = i[1:-1]
+            emoji = get(bot.emojis, name=em)
+            if emoji:
+                await message.add_reaction(emoji)
+        else:
+            await message.add_reaction(i)
     await bot.process_commands(message)
 
-@bot.event
-async def on_ready():
-    for emoji in bot.emojis:
-        print("Name:", emoji.name + ",", "ID:", emoji.id)
+
 
 
 
