@@ -18,7 +18,19 @@ def settingsdb(conn):
     else:
         print('No need')
         conn.commit()
-
+    print('prefixdb')
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('settingspref',))
+    check = (cur.fetchone()[0])
+    print(check)
+    if not check:
+        cur.execute('''CREATE TABLE settingspref (
+                NMB INT NOT NULL,
+                VAL CHAR(5) NOT NULL
+                );''')
+        print("Table created successfully")
+    else:
+        print('No need')
+        conn.commit()
 
 def makedb(conn):
     cur = conn.cursor()
@@ -190,3 +202,30 @@ def removelast(conn):
     rows = cur.fetchall()
     for j in rows:
         print(j)
+
+def setdefaults(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM settingspref FETCH FIRST ROW ONLY;")
+    a = str(cur.fetchone())
+    if a == 'None':
+        cur.execute("INSERT INTO settingspref VALUES (0,'/')")
+    conn.commit()
+
+def setprefix(conn, val):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM settingspref FETCH FIRST ROW ONLY;")
+    a = str(cur.fetchone())
+    if a == 'None':
+        cur.execute("INSERT INTO settingspref VALUES (0,%s)",(val, ))
+    else:
+        cur.execute("UPDATE settingspref SET VAL = %s WHERE NMB = 0",(val, ))
+
+def getprefix(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT VAL FROM settingspref FETCH FIRST ROW ONLY;")
+    a = str(cur.fetchone())
+    print(a)
+
+
+
+

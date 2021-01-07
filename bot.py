@@ -3,7 +3,7 @@ import random
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting
+from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, setprefix, setdefaults, getprefix
 
 import os
 import psycopg2
@@ -17,6 +17,8 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 settingsdb(conn)
 
 makedb(conn)
+
+setdefaults(conn)
 
 filldb(conn)
 
@@ -67,6 +69,13 @@ async def invite(ctx):
     message = "Want to invite a friend? Use this link: \n https://discord.gg/Fuvabsm"
     await ctx.message.delete()
     await ctx.send(message)
+
+@bot.command(name='setpref', help='sets a new prefix for bot',pass_context=True)
+@commands.has_role(ADMIN_ROLE)
+async def setpref(ctx, prefix):
+    setprefix(conn,prefix)
+    getprefix(conn)
+
 
 
 
