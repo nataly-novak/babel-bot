@@ -62,6 +62,12 @@ async def setpin(ctx):
     removesetting(conn,'settingspins',str(chan))
     await ctx.message.delete()
 
+@bot.command(name='invite',help='prints koai invite',pass_context=True)
+async def invite(ctx):
+    message = "Want to invite a friend? Use this link: \n https://discord.gg/Fuvabsm"
+    await ctx.message.delete()
+    await ctx.send(message)
+
 
 
 @bot.event
@@ -81,6 +87,7 @@ async def on_raw_reaction_remove(payload):
         print("emoji_removed")
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.unpin()
+
 
 
 
