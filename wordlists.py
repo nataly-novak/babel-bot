@@ -37,6 +37,7 @@ def getgroups(conn, id):
         groups.append('discussion')
     if groups == []:
         groups.append('none')
+    print(groups)
     return groups
 
 
