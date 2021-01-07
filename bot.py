@@ -117,6 +117,11 @@ async def on_message(message):
             await message.add_reaction(emoji)
     await bot.process_commands(message)
 
+@client.event
+async def on_ready():
+    for emoji in client.emojis:
+        print("Name:", emoji.name + ",", "ID:", emoji.id)
+
 
 
 
