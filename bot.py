@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
     setprefix, setdefaults, getprefix
 from wordlists import getreaction
+from discord.utils import get
 
 import os
 import psycopg2
