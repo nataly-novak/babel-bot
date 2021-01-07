@@ -224,7 +224,8 @@ def getprefix(conn):
     cur = conn.cursor()
     cur.execute("SELECT VAL FROM settingspref FETCH FIRST ROW ONLY;")
     a = str(cur.fetchone())
-    print(a)
+    b = a[2:-3].rstrip()
+    print(b)
 
 
 
