@@ -24,7 +24,7 @@ filldb(conn)
 
 TOKEN = os.getenv('TOKEN')
 
-bot = commands.Bot(command_prefix='/')
+bot = commands.Bot(command_prefix=getprefix(conn))
 
 ADMIN_ROLE = os.getenv('ADMIN_ROLE')
 
@@ -74,7 +74,11 @@ async def invite(ctx):
 @commands.has_role(ADMIN_ROLE)
 async def setpref(ctx, prefix):
     setprefix(conn,prefix)
-    getprefix(conn)
+    x = getprefix(conn)
+    await ctx.message.delete()
+    message = "Prefix is set to "+x
+    await ctx.send(message)
+
 
 
 

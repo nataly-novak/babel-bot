@@ -226,6 +226,7 @@ def getprefix(conn):
     a = str(cur.fetchone())
     b = a[2:-3].rstrip()
     print(b)
+    return b
 
 
 
