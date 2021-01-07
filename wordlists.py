@@ -34,8 +34,9 @@ def getgroup(conn, id):
     else:
         return 'none'
 
-def getreaction(conn, message, id):
+def getreaction(conn, message, id)
     name = getgroup(conn,id)
+    print(name)
     if name != 'none':
         return checkline(message,name)
     else:
