@@ -111,8 +111,8 @@ async def on_message(message):
     emo = getreaction(conn,line,chan)
     for i in emo:
         em = i[1:-1]
-        emoji = get(bot.get_all_emojis(), name=em)
-        await bot.add_reaction(message, emoji)
+        emoji = get(bot.emojis(), name=em)
+        await message.add_reaction(emoji)
     await bot.process_commands(message)
 
 
