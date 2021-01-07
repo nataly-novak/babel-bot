@@ -1,6 +1,6 @@
 discussion = {'english': '🇬🇧', 'japanese': '🇯🇵', 'spanish': '🇯🇵', 'french': '🇯🇵',
               'german': '🇯🇵', 'arabic': ':ArabLanguage:', 'mandarin': '🇨🇳'}
-quest = {"I will master": "⚔"}
+quest = {"i will master": "⚔"}
 accountability = {"pom": "🍅"}
 
 from dbwork import checksetting
@@ -19,8 +19,9 @@ def getdict(name):
 def checkline(line, name):
     words = getdict(name)
     emolist = []
+    line_n = line.lower()
     for i in words:
-        if i in line:
+        if i in line_n:
             emolist.append(words.get(i))
     return emolist
 
