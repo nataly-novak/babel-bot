@@ -24,7 +24,7 @@ filldb(conn)
 
 TOKEN = os.getenv('TOKEN')
 
-bot = commands.Bot(command_prefix=getprefix(conn))
+bot = commands.Bot(command_prefix=(getprefix(conn)))
 
 ADMIN_ROLE = os.getenv('ADMIN_ROLE')
 
