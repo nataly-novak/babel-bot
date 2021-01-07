@@ -104,7 +104,7 @@ async def on_raw_reaction_remove(payload):
 
 @bot.event
 async def on_message(message):
-    chan = message.channel_id
+    chan = message.channel.id
     line = message.content
     print(getreaction(conn,line,chan))
 
