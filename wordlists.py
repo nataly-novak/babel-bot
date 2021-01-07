@@ -37,8 +37,12 @@ def getgroup(conn, id):
 def getreaction(conn, message, id):
     name = getgroup(conn,id)
     print(name)
+    print(message)
     if name != 'none':
+        print(checkline(message,name))
         return checkline(message,name)
     else:
+        print('something went wrong')
         return []
+
 
