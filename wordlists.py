@@ -18,11 +18,9 @@ def getdict(name):
 
 def checkline(line, name):
     words = getdict(name)
-    print(words)
     emolist = []
     for i in words:
         if i in line:
-            print(i)
             emolist.append(words.get(i))
     return emolist
 
@@ -37,18 +35,17 @@ def getgroups(conn, id):
         groups.append('discussion')
     if groups == []:
         groups.append('none')
-    print(groups)
     return groups
 
 
 def getreaction(conn, message, id):
     names = getgroups(conn, id)
+    print(names)
     for name in names:
         if name != 'none':
-            print(checkline(message, name))
+            print(name)
             return checkline(message, name)
         else:
-            print('something went wrong')
             return []
 
 
