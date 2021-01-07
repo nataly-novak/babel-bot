@@ -111,7 +111,7 @@ async def on_message(message):
     emo = getreaction(conn,line,chan)
     for i in emo:
         print(i)
-        if em[:1] == ':':
+        if i[:1] == ':':
             em = i[1:-1]
             emoji = get(bot.emojis, name=em)
             if emoji:
