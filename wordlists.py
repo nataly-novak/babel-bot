@@ -21,6 +21,7 @@ def checkline(line, name):
     emolist = []
     for i in words:
         if i in line:
+            print(i)
             emolist.append(words.get(i))
     return emolist
 
