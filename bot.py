@@ -106,6 +106,7 @@ async def on_raw_reaction_remove(payload):
 async def on_message(message):
     chan = message.channel.id
     line = message.content
+    print(chan, line)
     print(getreaction(conn,line,chan))
     await bot.process_commands(message)
 
