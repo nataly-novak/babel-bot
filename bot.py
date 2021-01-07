@@ -3,7 +3,9 @@ import random
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, setprefix, setdefaults, getprefix
+from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
+    setprefix, setdefaults, getprefix
+from wordlists import getreaction
 
 import os
 import psycopg2
@@ -15,11 +17,8 @@ DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 settingsdb(conn)
-
 makedb(conn)
-
 setdefaults(conn)
-
 filldb(conn)
 
 TOKEN = os.getenv('TOKEN')
@@ -47,6 +46,7 @@ async def de(ctx):
     await ctx.message.delete()
     removelast(conn)
 
+
 @bot.command(name='addfunction', help='sets the channel for function', pass_context=True)
 @commands.has_role(ADMIN_ROLE)
 async def addfunction(ctx, function):
@@ -64,11 +64,13 @@ async def delfunction(ctx, function):
     removesetting(conn,function,str(chan))
     await ctx.message.delete()
 
+
 @bot.command(name='invite',help='prints koai invite',pass_context=True)
 async def invite(ctx):
     message = "Want to invite a friend? Use this link: \n https://discord.gg/Fuvabsm"
     await ctx.message.delete()
     await ctx.send(message)
+
 
 @bot.command(name='setpref', help='sets a new prefix for bot',pass_context=True)
 @commands.has_role(ADMIN_ROLE)
@@ -82,9 +84,6 @@ async def setpref(ctx, prefix):
     await ctx.send(message)
 
 
-
-
-
 @bot.event
 async def on_raw_reaction_add(payload):
     chan = payload.channel_id
@@ -92,7 +91,6 @@ async def on_raw_reaction_add(payload):
     if checksetting(conn,'accountability', chan) and payload.emoji.name == "📌":
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.pin()
-
 
 
 @bot.event
@@ -103,9 +101,13 @@ async def on_raw_reaction_remove(payload):
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.unpin()
 
-#@bot.event
-#async def on_message(message):
-#    chan = message.channel_id
+
+@bot.event
+async def on_message(message):
+    chan = message.channel_id
+    line = message.content
+    print(getreaction(conn,line,chan))
+
 
 
 
