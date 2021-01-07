@@ -18,6 +18,7 @@ def getdict(name):
 
 def checkline(line, name):
     words = getdict(name)
+    print(words)
     emolist = []
     for i in words:
         if i in line:
