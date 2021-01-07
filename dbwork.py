@@ -5,19 +5,19 @@ import random
 def settingsdb(conn):
     cur = conn.cursor()
     print('settingsdb')
-    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('settingspins',))
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('accountability',))
     check = (cur.fetchone()[0])
     print(check)
     if not check:
-        cur.execute('''CREATE TABLE settingspins (
+        cur.execute('''CREATE TABLE accountability (
             NMB INT NOT NULL,
             VAL CHAR(20) NOT NULL
             );''')
         print("Table created successfully")
-        cur.execute('ALTER TABLE settingspins ADD CONSTRAINT test_pkey2 PRIMARY KEY (VAL);')
+        cur.execute('ALTER TABLE accountability ADD CONSTRAINT test_pkey2 PRIMARY KEY (VAL);')
     else:
         print('No need')
-        conn.commit()
+    conn.commit()
     print('prefixdb')
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('settingspref',))
     check = (cur.fetchone()[0])
@@ -30,7 +30,36 @@ def settingsdb(conn):
         print("Table created successfully")
     else:
         print('No need')
-        conn.commit()
+    conn.commit()
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('discussion',))
+    check = (cur.fetchone()[0])
+    print(check)
+    if not check:
+        cur.execute('''CREATE TABLE discussion (
+                NMB INT NOT NULL,
+                VAL CHAR(20) NOT NULL
+                );''')
+        print("Table created successfully")
+        cur.execute('ALTER TABLE discussion ADD CONSTRAINT test_pkey3 PRIMARY KEY (VAL);')
+    else:
+        print('No need')
+    conn.commit()
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('quest',))
+    check = (cur.fetchone()[0])
+    print(check)
+    if not check:
+        cur.execute('''CREATE TABLE quest (
+                NMB INT NOT NULL,
+                VAL CHAR(20) NOT NULL
+                );''')
+        print("Table created successfully")
+        cur.execute('ALTER TABLE quest ADD CONSTRAINT test_pkey2 PRIMARY KEY (VAL);')
+    else:
+        print('No need')
+    conn.commit()
+
+
+
 
 def makedb(conn):
     cur = conn.cursor()

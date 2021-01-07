@@ -47,21 +47,21 @@ async def de(ctx):
     await ctx.message.delete()
     removelast(conn)
 
-@bot.command(name='setpin', help='sets the channel for pins', pass_context=True)
+@bot.command(name='addfunction', help='sets the channel for function', pass_context=True)
 @commands.has_role(ADMIN_ROLE)
-async def setpin(ctx):
+async def addfunction(ctx, function):
     chan = ctx.channel.id
     print(chan)
-    addsetting(conn,'settingspins',str(chan))
+    addsetting(conn,function,str(chan))
     await ctx.message.delete()
 
 
-@bot.command(name='delpin', help='removes the channel for from pin command list', pass_context=True)
+@bot.command(name='delfunction', help='removes the channel from the function list', pass_context=True)
 @commands.has_role(ADMIN_ROLE)
-async def setpin(ctx):
+async def delfunction(ctx, function):
     chan = ctx.channel.id
     print(chan)
-    removesetting(conn,'settingspins',str(chan))
+    removesetting(conn,function,str(chan))
     await ctx.message.delete()
 
 @bot.command(name='invite',help='prints koai invite',pass_context=True)
@@ -88,8 +88,8 @@ async def setpref(ctx, prefix):
 @bot.event
 async def on_raw_reaction_add(payload):
     chan = payload.channel_id
-    print(checksetting(conn,'settingspins', chan))
-    if checksetting(conn,'settingspins', chan) and payload.emoji.name == "📌":
+    print(checksetting(conn,'accountability', chan))
+    if checksetting(conn,'accountability', chan) and payload.emoji.name == "📌":
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.pin()
 
@@ -98,10 +98,15 @@ async def on_raw_reaction_add(payload):
 @bot.event
 async def on_raw_reaction_remove(payload):
     chan = payload.channel_id
-    if checksetting(conn,'settingspins', chan) and payload.emoji.name == "📌":
+    if checksetting(conn,'accountability', chan) and payload.emoji.name == "📌":
         print("emoji_removed")
         msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
         await msg.unpin()
+
+#@bot.event
+#async def on_message(message):
+#    chan = message.channel_id
+
 
 
 
