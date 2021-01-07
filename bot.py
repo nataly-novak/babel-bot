@@ -107,7 +107,7 @@ async def on_message(message):
     chan = message.channel.id
     line = message.content
     print(getreaction(conn,line,chan))
-    await client.process_commands(message)
+    await bot.process_commands(message)
 
 
 
