@@ -219,6 +219,7 @@ def setprefix(conn, val):
         cur.execute("INSERT INTO settingspref VALUES (0,%s)",(val, ))
     else:
         cur.execute("UPDATE settingspref SET VAL = %s WHERE NMB = 0",(val, ))
+    conn.commit()
 
 def getprefix(conn):
     cur = conn.cursor()
