@@ -74,7 +74,9 @@ async def invite(ctx):
 @commands.has_role(ADMIN_ROLE)
 async def setpref(ctx, prefix):
     setprefix(conn,prefix)
+    getprefix(conn)
     x = getprefix(conn)
+    bot.command_prefix = x
     await ctx.message.delete()
     message = "Prefix is set to "+x
     await ctx.send(message)
