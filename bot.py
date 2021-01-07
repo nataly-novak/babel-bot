@@ -112,7 +112,7 @@ async def on_message(message):
     for i in emo:
         print(i)
         em = i[1:-1]
-        emoji = get(bot.emojis(), name=em)
+        emoji = get(bot.emojis, name=em)
         await message.add_reaction(emoji)
     await bot.process_commands(message)
 
