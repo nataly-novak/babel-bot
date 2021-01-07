@@ -41,11 +41,15 @@ def getgroups(conn, id):
 def getreaction(conn, message, id):
     names = getgroups(conn, id)
     print(names)
+    emotes = []
     for name in names:
         if name != 'none':
             print(name)
-            return checkline(message, name)
-        else:
-            return []
+            emo = checkline(message, name)
+            for j in emo:
+                emotes.append(j)
+    return  emotes
+
+
 
 
