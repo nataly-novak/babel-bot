@@ -84,7 +84,7 @@ def makedb(conn):
 
 def filldb(conn):
     cur = conn.cursor()
-    f = open("international", "r")
+    f = open("international", "r", encoding="utf8")
     f1 = f.readlines()
     cnt = 0
     for i in f1:
