@@ -73,6 +73,17 @@ async def invite(ctx):
     await ctx.send(message)
 
 
+@bot.command(name='raid',help='prints link to raid room',pass_context=True)
+async def raid(ctx):
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'accountability', chan):
+        message = "RAID IS BEGINNING: \n https://cuckoo.team/koai"
+        await ctx.send(message)
+    await ctx.message.delete()
+
+
+
+
 @bot.command(name='setpref', help='sets a new prefix for bot',pass_context=True)
 @commands.has_role(ADMIN_ROLE)
 async def setpref(ctx, prefix):
