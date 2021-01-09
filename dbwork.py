@@ -252,6 +252,17 @@ def removelast(conn):
         x+=1
     return "we have " + str(x) + " quotes so far"
 
+def quotenumber(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT NUM, QUOT, TRAN from inter")
+    rows = cur.fetchall()
+    x = 0
+    for j in rows:
+        x += 1
+    return "we have " + str(x) + " quotes so far"
+
+
+
 def setdefaults(conn):
     cur = conn.cursor()
     cur.execute("SELECT * FROM settingspref FETCH FIRST ROW ONLY;")

@@ -4,7 +4,7 @@ import random
 from discord.ext import commands
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
-    setprefix, setdefaults, getprefix
+    setprefix, setdefaults, getprefix, quotenumber
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC
@@ -68,6 +68,15 @@ async def de(ctx):
     if checksetting(conn, 'bot', chan):
         await ctx.message.delete()
         message = removelast(conn)
+        await ctx.send(message)
+
+
+@bot.command(name='del', help='deletes last quote', pass_context=True)
+async def de(ctx):
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'bot', chan):
+        await ctx.message.delete()
+        message = quotenumber(conn)
         await ctx.send(message)
 
 
