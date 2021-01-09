@@ -45,9 +45,11 @@ bot = commands.Bot(command_prefix=(getprefix(conn)))
 
 @bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
 async def cookin(ctx):
-    response = randomquote(conn)
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'bot', chan):
+        response = randomquote(conn)
+        await ctx.send(response)
     await ctx.message.delete()
-    await ctx.send(response)
 
 
 @bot.command(name='add', help='Adds a quote. Use quotes around both quote and translation', pass_context=True)

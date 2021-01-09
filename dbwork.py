@@ -57,6 +57,20 @@ def settingsdb(conn):
     else:
         print('No need')
     conn.commit()
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('bot',))
+    check = (cur.fetchone()[0])
+    print(check)
+    if not check:
+        cur.execute('''CREATE TABLE bot (
+                NMB INT NOT NULL,
+                VAL CHAR(20) NOT NULL
+                );''')
+        print("Table created successfully")
+        cur.execute('ALTER TABLE bot ADD CONSTRAINT test_pkey5 PRIMARY KEY (VAL);')
+    else:
+        print('No need')
+    conn.commit()
+
 
 
 
