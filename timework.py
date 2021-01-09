@@ -12,3 +12,9 @@ def toUTC(date, time, zone):
     return conversion
 
 
+def currentUTC():
+    current = str(datetime.datetime.utcnow())
+    current = current.split(sep=".")[0]
+    current = current.rsplit(sep=":",maxsplit=1)[0]
+    return current
+

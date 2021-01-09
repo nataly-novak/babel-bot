@@ -7,7 +7,7 @@ from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb
     setprefix, setdefaults, getprefix
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
-from timework import toUTC
+from timework import toUTC, currentUTC
 
 import os
 import psycopg2
@@ -106,8 +106,13 @@ async def raid(ctx):
 
 
 @bot.command(name="utc",help="yyyy-mm-dd hh:mm timezone - converts to UTC", pass_context=True)
-async def utc(ctx, date, time, zone):
-    message = toUTC(date, time, zone)
+async def utc(ctx, date="", time="", zone=""):
+    if date=="" and time=="" and zone == "":
+        message = currentUTC()
+    elif date != "" and time != "" and zone != "":
+        message = toUTC(date, time, zone)
+    else:
+        message = "Please use the format yyyy-mm-dd hh:mm Continent/City"
     await ctx.send(message)
 
 
