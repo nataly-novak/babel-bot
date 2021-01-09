@@ -1,7 +1,7 @@
 discussion = {'english': '🇬🇧', 'japanese': '🇯🇵', 'spanish': '🇪🇸', 'french': '🇫🇷',
-              'german': '🇩🇪', 'arabic': ':ArabLanguage:', 'mandarin': '🇨🇳'}
-quest = {"i will master": "⚔"}
-accountability = {"pom": "🍅", "pomming": "🍅"}
+              'german': '🇩🇪', 'arabic': ':ArabLanguage:', 'mandarin': '🇨🇳', "good morning": "🌞", "love":"😍","hug":":BlobHug:" }
+quest = {"i will master": "⚔", "reflection": "🛡️"}
+accountability = {"pom": "🍅"}
 
 from dbwork import checksetting
 
