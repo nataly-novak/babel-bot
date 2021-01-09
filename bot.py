@@ -119,7 +119,7 @@ async def utc(ctx, date="", time="", zone=""):
     if date=="" and time=="" and zone == "":
         message = currentUTC()
     elif time != "" and zone != "":
-        if date == "":
+        if date == "today":
             date = getToday(zone)
         message = toUTC(date, time, zone)
     else:
@@ -132,7 +132,7 @@ async def local(ctx, date, time, zone):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
         if time != "" and zone != "":
-            if date == "":
+            if date == "today":
                 date = utcToday()
             message = toLocal(date, time, zone)
         else:
