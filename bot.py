@@ -5,8 +5,9 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
     setprefix, setdefaults, getprefix
-from wordlists import getreaction
+from wordlists import getreaction, worddicts, help
 from discord.utils import get
+from timework import toUTC
 
 import os
 import psycopg2
@@ -39,6 +40,7 @@ settingsdb(conn)
 makedb(conn)
 setdefaults(conn)
 filldb(conn)
+help_items = worddicts()
 
 bot = commands.Bot(command_prefix=(getprefix(conn)))
 
@@ -98,6 +100,18 @@ async def raid(ctx):
     await ctx.message.delete()
 
 
+@bot.command(name="utc",help="yyyy-mm-dd hh:mm timezone - converts to UTC", pass_context=True)
+async def utc(ctx, date, time, zone):
+    message = toUTC(date, time, zone)
+    await ctx.message.delete()
+    await ctx.send(message)
+
+
+@bot.command(name='info',help='gives info on essential KOAI concepts',pass_context=True)
+async def raid(ctx, theme):
+    message = help(help_items, theme)
+    await ctx.message.delete()
+    await ctx.send(message)
 
 
 @bot.command(name='setpref', help='sets a new prefix for bot',pass_context=True)

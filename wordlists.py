@@ -51,6 +51,29 @@ def getreaction(conn, message, id):
                 emotes.append(j)
     return  emotes
 
+def worddicts():
+    help = {}
+    f = open("help", "r",encoding="utf8")
+    f1 = f.readlines()
+    for i in f1:
+        line = i.rstrip().split(sep=" - ")
+        help[line[0]] = line[1]
+    return help
+
+def help(help, item):
+    themes = ""
+    for i in help:
+        themes = themes+i+", "
+    themes = themes[:-2]
+    if item in help:
+        return item+" - "+help[item]
+    elif item == "":
+        return "Please specify your question. Try options like: "+ themes
+    else:
+        return "I do not have information about this word. Please ask the members of the server for support. I only know about: "+ themes
+
+print(help(worddicts(),"koai"))
+
 
 
 
