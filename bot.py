@@ -12,21 +12,35 @@ import os
 import psycopg2
 
 load_dotenv()
+STAGE = os.getenv('STAGE')
+TOKEN = os.getenv('TOKEN')
+ADMIN_ROLE = os.getenv('ADMIN_ROLE')
+if STAGE == 'dev':
+    DATABASE_URL = os.environ['DATABASE_URL']
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
-DATABASE_URL = os.environ['DATABASE_URL']
+else:
+    PSQL_HOST = os.getenv('PSQL_HOST')
+    PSQL_USER = os.getenv('PSQL_USER')
+    PSQL_DATABASE = os.getenv('PSQL_DATABASE')
+    PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
+    conn = psycopg2.connect(
+        host=PSQL_HOST,
+        user=PSQL_USER,
+        dbname=PSQL_DATABASE,
+        password=PSQL_PASSWORD
+    )
 
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+
+
 
 settingsdb(conn)
 makedb(conn)
 setdefaults(conn)
 filldb(conn)
 
-TOKEN = os.getenv('TOKEN')
-
 bot = commands.Bot(command_prefix=(getprefix(conn)))
-
-ADMIN_ROLE = os.getenv('ADMIN_ROLE')
 
 
 @bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
