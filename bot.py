@@ -71,8 +71,8 @@ async def de(ctx):
         await ctx.send(message)
 
 
-@bot.command(name='del', help='deletes last quote', pass_context=True)
-async def de(ctx):
+@bot.command(name='quotenumber', help='deletes last quote', pass_context=True)
+async def quotenumber(ctx):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
         await ctx.message.delete()
