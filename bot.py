@@ -4,7 +4,7 @@ import random
 from discord.ext import commands
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
-    setprefix, setdefaults, getprefix, quotenumber
+    setprefix, setdefaults, getprefix, quotenum
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC
@@ -76,7 +76,7 @@ async def quotenumber(ctx):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
         await ctx.message.delete()
-        message = quotenumber(conn)
+        message = quotenum(conn)
         await ctx.send(message)
 
 
