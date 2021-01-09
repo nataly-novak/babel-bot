@@ -164,9 +164,4 @@ async def on_message(message):
 
 
 
-
-
-
-
-
 bot.run(TOKEN)
