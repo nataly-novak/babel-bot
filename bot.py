@@ -108,7 +108,6 @@ async def raid(ctx):
 @bot.command(name="utc",help="yyyy-mm-dd hh:mm timezone - converts to UTC", pass_context=True)
 async def utc(ctx, date, time, zone):
     message = toUTC(date, time, zone)
-    await ctx.message.delete()
     await ctx.send(message)
 
 
