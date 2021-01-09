@@ -231,8 +231,11 @@ def addquote(conn, language, line, trans=""):
     conn.commit()
     cur.execute("SELECT NUM, QUOT, TRAN from inter")
     rows = cur.fetchall()
+    x = 0
     for j in rows:
         print(j)
+        x+=1
+    return "we have "+x +" quotes so far"
 
 def removelast(conn):
     cur = conn.cursor()
@@ -243,8 +246,11 @@ def removelast(conn):
     conn.commit()
     cur.execute("SELECT NUM, QUOT, TRAN from inter")
     rows = cur.fetchall()
+    x = 0
     for j in rows:
         print(j)
+        x+=1
+    return "we have " + x + " quotes so far"
 
 def setdefaults(conn):
     cur = conn.cursor()

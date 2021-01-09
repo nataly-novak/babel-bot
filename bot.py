@@ -58,13 +58,17 @@ async def cookin(ctx):
 async def itl(ctx, language, line, trans=""):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
-        addquote(conn, language, line, trans)
+        message = addquote(conn, language, line, trans)
+        await ctx.send(message)
 
 
 @bot.command(name='del', help='deletes last quote', pass_context=True)
 async def de(ctx):
-    await ctx.message.delete()
-    removelast(conn)
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'bot', chan):
+        await ctx.message.delete()
+        message = removelast(conn)
+        await ctx.send(message)
 
 
 @bot.command(name='addfunction', help='sets the channel for function', pass_context=True)
