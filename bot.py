@@ -7,7 +7,7 @@ from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb
     setprefix, setdefaults, getprefix, quotenum
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
-from timework import toUTC, currentUTC, toLocal
+from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 
 import os
 import psycopg2
@@ -118,7 +118,9 @@ async def raid(ctx):
 async def utc(ctx, date="", time="", zone=""):
     if date=="" and time=="" and zone == "":
         message = currentUTC()
-    elif date != "" and time != "" and zone != "":
+    elif time != "" and zone != "":
+        if date == "":
+            date = getToday(zone)
         message = toUTC(date, time, zone)
     else:
         message = "Please use the format yyyy-mm-dd hh:mm Continent/City"
@@ -129,7 +131,9 @@ async def utc(ctx, date="", time="", zone=""):
 async def local(ctx, date, time, zone):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
-        if date != "" and time != "" and zone != "":
+        if time != "" and zone != "":
+            if date == "":
+                date = utcToday()
             message = toLocal(date, time, zone)
         else:
             message = "Please use the format yyyy-mm-dd hh:mm Continent/City"
