@@ -125,15 +125,17 @@ async def utc(ctx, date="", time="", zone=""):
     await ctx.send(message)
 
 
-@bot.command(name="local",help="yyyy-mm-dd hh:mm timezone:Continent/City - converts UTC to your Timezone", pass_context=True)
+@bot.command(name="local",help="yyyy-mm-dd hh:mm timezone:Continent/City - converts UTC to your Timezone, works in bot channel", pass_context=True)
 async def local(ctx, date, time, zone):
-    if date != "" and time != "" and zone != "":
-        message = toLocal(date, time, zone)
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'bot', chan):
+        if date != "" and time != "" and zone != "":
+            message = toLocal(date, time, zone)
+        else:
+            message = "Please use the format yyyy-mm-dd hh:mm Continent/City"
+        await ctx.send(message)
     else:
-        message = "Please use the format yyyy-mm-dd hh:mm Continent/City"
-    await ctx.send(message)
-
-
+        await ctx.message.delete()
 
 @bot.command(name='info',help='gives info on essential KOAI concepts',pass_context=True)
 async def raid(ctx, theme = ""):
