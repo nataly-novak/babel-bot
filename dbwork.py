@@ -235,7 +235,7 @@ def addquote(conn, language, line, trans=""):
     for j in rows:
         print(j)
         x+=1
-    return "we have "+x +" quotes so far"
+    return "we have "+str(x) +" quotes so far"
 
 def removelast(conn):
     cur = conn.cursor()
@@ -250,7 +250,7 @@ def removelast(conn):
     for j in rows:
         print(j)
         x+=1
-    return "we have " + x + " quotes so far"
+    return "we have " + str(x) + " quotes so far"
 
 def setdefaults(conn):
     cur = conn.cursor()
