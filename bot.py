@@ -7,7 +7,7 @@ from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb
     setprefix, setdefaults, getprefix, quotenum
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
-from timework import toUTC, currentUTC
+from timework import toUTC, currentUTC, toLocal
 
 import os
 import psycopg2
@@ -114,7 +114,7 @@ async def raid(ctx):
     await ctx.message.delete()
 
 
-@bot.command(name="utc",help="yyyy-mm-dd hh:mm timezone - converts to UTC", pass_context=True)
+@bot.command(name="utc",help="yyyy-mm-dd hh:mm timezone:Continent/City - converts to UTC", pass_context=True)
 async def utc(ctx, date="", time="", zone=""):
     if date=="" and time=="" and zone == "":
         message = currentUTC()
@@ -123,6 +123,16 @@ async def utc(ctx, date="", time="", zone=""):
     else:
         message = "Please use the format yyyy-mm-dd hh:mm Continent/City"
     await ctx.send(message)
+
+
+@bot.command(name="local",help="yyyy-mm-dd hh:mm timezone:Continent/City - converts UTC to your Timezone", pass_context=True)
+async def local(ctx, date, time, zone):
+    if date != "" and time != "" and zone != "":
+        message = toLocal(date, time, zone)
+    else:
+        message = "Please use the format yyyy-mm-dd hh:mm Continent/City"
+    await ctx.send(message)
+
 
 
 @bot.command(name='info',help='gives info on essential KOAI concepts',pass_context=True)
