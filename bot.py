@@ -108,7 +108,7 @@ async def utc(ctx, date, time, zone):
 
 
 @bot.command(name='info',help='gives info on essential KOAI concepts',pass_context=True)
-async def raid(ctx, theme):
+async def raid(ctx, theme = ""):
     message = help(help_items, theme)
     await ctx.message.delete()
     await ctx.send(message)
