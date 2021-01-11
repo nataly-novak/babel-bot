@@ -234,7 +234,9 @@ async def on_member_update(before, after):
     if len(before.roles) < len(after.roles):
         newRole = next(role for role in after.roles if role not in before.roles)
         if checkrole(newRole.name):
-            print(newRole.name)
+            chan = (roletochan(conn,newRole.name))
+            print(chan)
+
 
 
 
