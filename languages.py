@@ -47,7 +47,7 @@ def getlanchan(conn, language):
     resp = str(cur.fetchone())
     chan = resp[2:-3].strip()
     print(chan)
-    if chan != "None":
+    if chan != "":
         id = int(chan)
     else:
         id = -1

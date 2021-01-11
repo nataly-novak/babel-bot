@@ -10,6 +10,7 @@ from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 from languages import checkrole, roletochan, addlanguage, languagedb
+from randomer import coin, rannum
 
 import os
 import psycopg2
@@ -175,6 +176,20 @@ async def addlang(ctx, language):
     print(chan)
     addlanguage(conn,language,chan)
     await ctx.message.delete()
+
+
+@bot.command(name='flip', help='flips a coin',pass_context=True)
+async def flip(ctx):
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'bot', chan):
+        await ctx.send(coin())
+
+
+@bot.command(name='rand', help='flips a coin',pass_context=True)
+async def ran(ctx, number, amount = 1):
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'bot', chan):
+        await ctx.send(rannum(number,amount))
 
 
 
