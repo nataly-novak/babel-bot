@@ -11,7 +11,7 @@ def languagedb(conn):
     print(check)
     if not check:
         cur.execute('''CREATE TABLE languages (
-                    NUM INT NOT NULL,
+                    NMB INT NOT NULL,
                     LANG CHAR(30) NOT NULL,
                     CHAN CHAR(20) NOT NULL
                     );''')
@@ -25,7 +25,7 @@ def languagedb(conn):
 
 def addlanguage(conn, language, id):
     cur = conn.cursor()
-    cur.execute("SELECT MAX(NUM) FROM languages;")
+    cur.execute("SELECT MAX(NMB) FROM languages;")
     a = str(cur.fetchone())
     print(a)
     if a == '(None,)':
@@ -34,7 +34,7 @@ def addlanguage(conn, language, id):
         ar = int(a[1:-2]) + 1
     print(ar)
     cur.execute("INSERT INTO inter VALUES (%s,%s,%s) ON CONFLICT (LANG) DO UPDATE SET CHAN = excluded.CHAN ;", (ar, language, id))
-    cur.execute("SELECT NUM, QUOT, TRAN from inter")
+    cur.execute("SELECT NMB, QUOT, TRAN from inter")
     rows = cur.fetchall()
     x = 0
     for j in rows:
