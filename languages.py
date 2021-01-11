@@ -54,6 +54,7 @@ def roletochan(conn, role):
     n = roles.index(role)
     a = chans[n]
     item = a.ljust(30)
+    print(item)
     return getlanchan(conn, item)
 
 
