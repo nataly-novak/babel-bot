@@ -11,7 +11,7 @@ def languagedb(conn):
     print(check)
     if not check:
         cur.execute('''CREATE TABLE languages (
-                    NMB INT NOT NULL,
+                    NUM INT NOT NULL,
                     LANG CHAR(30) NOT NULL,
                     CHAN CHAR(20) NOT NULL
                     );''')
