@@ -169,6 +169,7 @@ async def setpref(ctx, prefix):
 @commands.has_role(ADMIN_ROLE)
 async def addlang(ctx, language):
     chan = ctx.channel.id
+    print(chan)
     addlanguage(conn,language,chan)
     await ctx.message.delete()
 
