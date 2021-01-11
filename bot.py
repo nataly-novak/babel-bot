@@ -207,7 +207,7 @@ async def on_message(message):
         if bot.hug_breaker > 3:
             bot.hug_counter = 0
         if bot.hug_counter ==5:
-            response = ":BlobHug:"
+            response = hug
             bot.hug_counter = 0
             await message.channel.send(response)
 
