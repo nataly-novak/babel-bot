@@ -184,7 +184,7 @@ async def on_raw_reaction_remove(payload):
 
 @bot.event
 async def on_message(message):
-    hug = get(bot.emojis, name=':BlobHug:')
+    hug = get(bot.emojis, name='BlobHug')
     chan = message.channel.id
     line = message.content
     print(getreaction(conn,line,chan))
