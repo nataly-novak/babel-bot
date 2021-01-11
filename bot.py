@@ -189,7 +189,7 @@ async def flip(ctx):
 async def ran(ctx, number, amount = 1):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
-        await ctx.send(rannum(number,amount))
+        await ctx.send(rannum(int(number),int(amount)))
 
 
 
@@ -251,6 +251,9 @@ async def on_member_update(before, after):
         if checkrole(newRole.name):
             chan = (roletochan(conn,newRole.name))
             print(chan)
+            if chan != -1:
+                channel = bot.get_channel(chan)
+                await channel.send("{0}.mention joined {1}", after, newRole.name)
 
 
 
