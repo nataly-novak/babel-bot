@@ -45,9 +45,11 @@ def getlanchan(conn, language):
     cur = conn.cursor()
     cur.execute("SELECT CHAN FROM languages WHERE LANG = %s", (language,))
     resp = str(cur.fetchone())
-    print("!!!"+resp)
     chan = resp[2:-3].strip()
-    id = int(chan)
+    if id != "None":
+        id = int(chan)
+    else:
+        id = -1
     return id
 
 def roletochan(conn, role):
