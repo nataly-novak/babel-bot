@@ -14,7 +14,7 @@ from languages import checkrole, roletochan, addlanguage, languagedb
 import os
 import psycopg2
 
-intents = discord.Intents(members = True, emojis = True, messages = True, reactions = True, presence = True)
+intents = discord.Intents(members = True, emojis = True, messages = True, reactions = True, presences = True)
 
 load_dotenv()
 STAGE = os.getenv('STAGE')
