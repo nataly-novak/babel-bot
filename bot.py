@@ -8,7 +8,7 @@ from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
-from languages import checkrole, roletochan, addlanguage
+from languages import checkrole, roletochan, addlanguage, languagedb
 
 import os
 import psycopg2
@@ -43,6 +43,7 @@ makedb(conn)
 setdefaults(conn)
 filldb(conn)
 help_items = worddicts()
+languagedb(conn)
 
 bot = commands.Bot(command_prefix=(getprefix(conn)))
 
