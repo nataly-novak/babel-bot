@@ -230,7 +230,7 @@ async def on_message(message):
 
 
 @bot.event
-async def on_member_update(before, after):
+async def on_member_update(self, before, after):
     print("newrole")
     print((before.roles))
     print((after.roles))
