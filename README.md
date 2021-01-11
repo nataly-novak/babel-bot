@@ -28,6 +28,12 @@ If you wrote it wrong - /del removes last quote. Please stay civil and don't del
 
 /invite prints KOAI invite link
 
+/coin flips a coin for you
+
+/rand number_of_participants number_of winners - choses random winners
+
+the bot also welcomes you when you join a new channel
+
 Keepers can adjust channel roles with /addfunction and prefix with /setpref
 
 
