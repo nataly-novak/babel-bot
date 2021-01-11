@@ -2,6 +2,7 @@ import os
 import random
 
 from discord.ext import commands
+import discord
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
     setprefix, setdefaults, getprefix, quotenum
@@ -13,6 +14,7 @@ from languages import checkrole, roletochan, addlanguage, languagedb
 import os
 import psycopg2
 
+intents = discord.Intents(members = True, emojis = True, messages = True, reactions = True)
 
 load_dotenv()
 STAGE = os.getenv('STAGE')
@@ -45,7 +47,7 @@ filldb(conn)
 help_items = worddicts()
 languagedb(conn)
 
-bot = commands.Bot(command_prefix=(getprefix(conn)))
+bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
 bot.hug_counter = 0
 bot.hug_breaker = 0
