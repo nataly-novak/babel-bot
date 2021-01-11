@@ -45,7 +45,6 @@ help_items = worddicts()
 
 bot = commands.Bot(command_prefix=(getprefix(conn)))
 
-hug = get(bot.emojis, name=":BlobHug:")
 bot.hug_counter = 0
 bot.hug_breaker = 0
 
@@ -185,6 +184,7 @@ async def on_raw_reaction_remove(payload):
 
 @bot.event
 async def on_message(message):
+    hug = get(bot.emojis, name=':BlobHug:')
     chan = message.channel.id
     line = message.content
     print(getreaction(conn,line,chan))
@@ -207,7 +207,7 @@ async def on_message(message):
         if bot.hug_breaker > 3:
             bot.hug_counter = 0
         if bot.hug_counter ==5:
-            response = str(hug)
+            response =str(hug)
             bot.hug_counter = 0
             await message.channel.send(response)
 
