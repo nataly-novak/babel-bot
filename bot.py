@@ -232,7 +232,7 @@ async def on_message(message):
 @bot.event
 async def on_member_update(before, after):
     print("newrole")
-    print(before.nick)
+    print(str(before.nick))
     print(before.roles)
     print(after.roles)
     if len(before.roles) < len(after.roles):
