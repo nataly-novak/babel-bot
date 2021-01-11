@@ -34,7 +34,7 @@ def addlanguage(conn, language, id):
         ar = int(a[1:-2]) + 1
     print(ar)
     cur.execute("INSERT INTO languages VALUES (%s,%s,%s) ON CONFLICT (LANG) DO UPDATE SET CHAN = excluded.CHAN ;", (ar, language, id))
-    cur.execute("SELECT NMB, QUOT, TRAN from inter")
+    cur.execute("SELECT NMB,LANG, CHAN from languages")
     rows = cur.fetchall()
     x = 0
     for j in rows:
