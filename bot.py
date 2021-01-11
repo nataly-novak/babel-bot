@@ -231,8 +231,8 @@ async def on_message(message):
 
 @bot.event
 async def on_member_update(before, after):
-    print("newrole")
-    print(before.status,after.status)
+    if before.roles != after.roles:
+        print("newrole")
 
 
 
