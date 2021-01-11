@@ -8,6 +8,7 @@ from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
+from languages import checkrole, roletochan, addlanguage
 
 import os
 import psycopg2
@@ -164,6 +165,15 @@ async def setpref(ctx, prefix):
     await ctx.send(message)
 
 
+@bot.command(name='addlang', help='sets language channel',pass_context=True)
+@commands.has_role(ADMIN_ROLE)
+async def addlang(ctx, language):
+    chan = ctx.channel.id
+    addlanguage(conn,language,chan)
+    await ctx.message.delete()
+
+
+
 @bot.event
 async def on_raw_reaction_add(payload):
     chan = payload.channel_id
@@ -213,6 +223,17 @@ async def on_message(message):
 
 
     await bot.process_commands(message)
+
+
+@bot.event
+async def on_member_update(before, after):
+    if len(before.roles) < len(after.roles):
+        new_role = next(role for role in after.roles if role not in before.roles)
+        if checkrole(new_role.name):
+            msg = "{0.mention} welcome to {1}"
+            id = roletochan(conn, new_role.name)
+            chan = bot.get_channel(id)
+            await chan.send(msg.format(after, chan.name))
 
 
 
