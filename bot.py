@@ -232,8 +232,8 @@ async def on_message(message):
 @bot.event
 async def on_member_update(before, after):
     print("newrole")
-    print(len(before.roles))
-    print(len(after.roles))
+    print((before.roles))
+    print((after.roles))
     if len(before.roles) < len(after.roles):
         print("newrole")
         new_role = next(role for role in after.roles if role not in before.roles)
