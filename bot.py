@@ -253,7 +253,7 @@ async def on_member_update(before, after):
             print(chan)
             if chan != -1:
                 channel = bot.get_channel(chan)
-                await channel.send("{0} joined {1}".format(after.mention, newRole.name))
+                await channel.send("{0} joined #{1}".format(after.mention, channel.name))
 
 
 
