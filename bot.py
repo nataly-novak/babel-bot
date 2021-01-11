@@ -199,7 +199,7 @@ async def on_message(message):
         else:
             await message.add_reaction(i)
     if checksetting(conn, "discussion", chan):
-        if hug in line:
+        if ":BlobHug:" in line:
             bot.hug_counter += 1
             bot.hug_breaker = 0
         else:
@@ -207,7 +207,7 @@ async def on_message(message):
         if bot.hug_breaker > 3:
             bot.hug_counter = 0
         if bot.hug_counter ==5:
-            response = hug
+            response = ":BlobHug:"
             bot.hug_counter = 0
             await message.channel.send(response)
 
