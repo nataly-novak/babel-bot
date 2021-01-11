@@ -45,7 +45,7 @@ def getlanchan(conn, language):
     cur = conn.cursor()
     cur.execute("SELECT CHAN FROM languages WHERE LANG = %s", (language,))
     resp = str(cur.fetchone())
-    print(resp)
+    print("!!!"+resp)
     chan = resp[2:-3].strip()
     id = int(chan)
     return id
