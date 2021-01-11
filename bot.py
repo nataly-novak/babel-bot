@@ -12,6 +12,7 @@ from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 import os
 import psycopg2
 
+
 load_dotenv()
 STAGE = os.getenv('STAGE')
 TOKEN = os.getenv('TOKEN')
@@ -43,6 +44,10 @@ filldb(conn)
 help_items = worddicts()
 
 bot = commands.Bot(command_prefix=(getprefix(conn)))
+
+hug = get(bot.emojis, name=":BlobHug:")
+bot.hug_counter = 0
+bot.hug_breaker = 0
 
 
 @bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
@@ -193,6 +198,20 @@ async def on_message(message):
                 await message.add_reaction(emoji)
         else:
             await message.add_reaction(i)
+    if checksetting(conn, "discussion", chan):
+        if hug in line:
+            bot.hug_counter += 1
+            bot.hug_breaker = 0
+        else:
+            bot.hug_breaker = min(4, bot.hug_breaker+1)
+        if bot.hug_breaker > 3:
+            bot.hug_counter = 0
+        if bot.hug_counter ==5:
+            response = hug
+            bot.hug_counter = 0
+            await message.channel.send(response)
+
+
     await bot.process_commands(message)
 
 
