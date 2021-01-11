@@ -14,7 +14,7 @@ from languages import checkrole, roletochan, addlanguage, languagedb
 import os
 import psycopg2
 
-intents = discord.Intents(members = True, emojis = True, messages = True, reactions = True, presences = True)
+intents = discord.Intents.all()
 
 load_dotenv()
 STAGE = os.getenv('STAGE')
@@ -232,9 +232,11 @@ async def on_message(message):
 @bot.event
 async def on_member_update(before, after):
     if len(before.roles) < len(after.roles):
-        print('!!!!!!!!')
-        # The user has gained a new role, so lets find out which one
         newRole = next(role for role in after.roles if role not in before.roles)
+        if checkrole(newRole.name):
+            print(newRole.name)
+
+
 
 
 

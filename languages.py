@@ -52,7 +52,8 @@ def getlanchan(conn, language):
 def roletochan(conn, role):
     n = roles.index(role)
     a = chans[n]
-    return getlanchan(conn, a)
+    item = a.ljust(30)
+    return getlanchan(conn, item)
 
 
 def checkrole(role):
