@@ -232,20 +232,7 @@ async def on_message(message):
 @bot.event
 async def on_member_update(before, after):
     print("newrole")
-    print(str(before.nick))
-    print(before.roles)
-    print(after.roles)
-    if len(before.roles) < len(after.roles):
-        print("newrole")
-        new_role = next(role for role in after.roles if role not in before.roles)
-        print(new_role.name)
-        if checkrole(new_role.name):
-            print("checked")
-            msg = "{0.mention} welcome to {1}"
-            id = roletochan(conn, new_role.name)
-            chan = bot.get_channel(id)
-            await chan.send(msg.format(after, chan.name))
-
+    print(before.nick)
 
 
 
