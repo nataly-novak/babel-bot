@@ -14,7 +14,7 @@ from languages import checkrole, roletochan, addlanguage, languagedb
 import os
 import psycopg2
 
-intents = discord.Intents(members = True, emojis = True, messages = True, reactions = True)
+intents = discord.Intents(members = True, emojis = True, messages = True, reactions = True, presence = True)
 
 load_dotenv()
 STAGE = os.getenv('STAGE')
@@ -232,7 +232,7 @@ async def on_message(message):
 @bot.event
 async def on_member_update(before, after):
     print("newrole")
-    print(before.id,after.id)
+    print(before.roles,after.roles)
 
 
 
