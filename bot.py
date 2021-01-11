@@ -231,7 +231,8 @@ async def on_message(message):
 
 @bot.event
 async def on_member_update(before, after):
-
+    print(len(before.roles))
+    print(len(after.roles))
     if len(before.roles) < len(after.roles):
         print("newrole")
         new_role = next(role for role in after.roles if role not in before.roles)
@@ -242,6 +243,7 @@ async def on_member_update(before, after):
             id = roletochan(conn, new_role.name)
             chan = bot.get_channel(id)
             await chan.send(msg.format(after, chan.name))
+
 
 
 
