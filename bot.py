@@ -53,6 +53,7 @@ bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 bot.hug_counter = 0
 bot.hug_breaker = 0
 bot.minutes = 0
+bot.raid_id = 0
 
 @bot.event
 async def on_ready():
@@ -132,11 +133,13 @@ async def invite(ctx):
 async def raid(ctx):
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
-        message = "RAID IS BEGINNING: \n https://cuckoo.team/koai"
-        await ctx.send(message)
+        message = "RAID IS BEGINNING: 25 minutes left"
+        sent = await ctx.send(message)
     await ctx.message.delete()
     getchannel(conn,'accountability')
     looper.start()
+    bot.raid_id = sent.id
+    sent.pin()
 
 
 
@@ -277,12 +280,18 @@ async def on_member_update(before, after):
 async def looper():
 
     print(bot.minutes)
+    if bot.minutes > 0:
+        raider = bot.get_channel(getchannel(conn,"accountability")).fetch_message(bot.raid_id)
+        remain = "RAID HAS "+str(looper.count-1-bot.minutes)+" MINUTES TO GO"
+        await raider.edit(content = remain)
     bot.minutes += 1
 
 
 @looper.after_loop
 async def raid_done():
     print("raid done")
+    channel = bot.get_channel(getchannel(conn,"accountability"))
+    await channel.send ("raid done")
 
 
 

@@ -295,7 +295,7 @@ def getchannel(conn, name):
     cur.execute(line1)
     a = str(cur.fetchone())
     b = a.strip(" ,()\'")
-    print(b)
+    return int(b)
 
 
 
