@@ -57,7 +57,7 @@ bot.hug_breaker = 0
 async def on_ready():
     print ("Booting up your system")
     print ("I am running on " + bot.user.name)
-    print ("With the ID: " + bot.user.id)
+    print ("With the ID: " + str(bot.user.id))
     for guild in bot.guilds:
         for channel in guild.channel:
             if channel.type == "Text":
