@@ -283,7 +283,7 @@ async def looper():
 
     print(bot.minutes)
     chan = getchannel(conn, "accountability")
-    print(bot.raid_id+" raid")
+    print(str(bot.raid_id)+" raid")
     if bot.minutes > 0:
         raider = bot.get_channel(chan).fetch_message(bot.raid_id)
         remain = "RAID HAS "+str(looper.count-1-bot.minutes)+" MINUTES TO GO"
