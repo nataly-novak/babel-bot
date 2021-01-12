@@ -141,6 +141,7 @@ async def raid(ctx):
     looper.start()
     print("sentid" + sent.id)
     bot.raid_id = sent.id
+    print(bot.raid_id+ "WHY")
     await sent.pin()
 
 
