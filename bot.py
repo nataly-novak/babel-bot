@@ -1,7 +1,7 @@
 import os
 import random
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
@@ -52,6 +52,7 @@ bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
 bot.hug_counter = 0
 bot.hug_breaker = 0
+bot.minutes = 0
 
 @bot.event
 async def on_ready():
@@ -60,7 +61,7 @@ async def on_ready():
     print ("With the ID: " + str(bot.user.id))
     for guild in bot.guilds:
         for channel in guild.channels:
-            if channel.type == "Text":
+            if issubclass(channel, discord.TextChannel()):
                 print(channel.name)
                 if checkchan(channel.name):
                     print(channel.name)
@@ -272,7 +273,9 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-
+@tasks.loop(minutes=1)
+async def looper():
+    print("i")
 
 
 
