@@ -63,6 +63,8 @@ async def on_ready():
             if channel.type == "Text":
                 if checkchan(channel.name):
                     print(channel.name)
+                else:
+                    print(channel.name+" did not work")
 
 
 
