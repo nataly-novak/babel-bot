@@ -60,13 +60,10 @@ async def on_ready():
     print ("I am running on " + bot.user.name)
     print ("With the ID: " + str(bot.user.id))
     for guild in bot.guilds:
-        for channel in guild.channels:
-            if issubclass(channel, discord.TextChannel):
+        for channel in guild.text_channels:
                 print(channel.name)
                 if checkchan(channel.name):
                     print(channel.name)
-                else:
-                    print(channel.name+" did not work")
 
 
 
