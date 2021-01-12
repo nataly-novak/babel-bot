@@ -294,7 +294,8 @@ def getchannel(conn, name):
     line1 = "SELECT VAL FROM " + name
     cur.execute(line1)
     a = str(cur.fetchone())
-    print(a)
+    b = a.strip(" ,()\'")
+    print(b)
 
 
 
