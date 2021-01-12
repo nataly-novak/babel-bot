@@ -64,6 +64,7 @@ async def on_ready():
                 if checkchan(channel.name):
                     print(channel.name)
                     addlanguage(conn,channel.name, channel.id)
+    looper.start()
 
 
 
