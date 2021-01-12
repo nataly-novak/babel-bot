@@ -280,7 +280,7 @@ async def looper():
 
 
 @looper.after_loop
-async def raid_done:
+async def raid_done():
     print("raid done")
 
 
