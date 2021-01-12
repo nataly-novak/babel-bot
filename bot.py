@@ -5,7 +5,7 @@ from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
-    setprefix, setdefaults, getprefix, quotenum
+    setprefix, setdefaults, getprefix, quotenum, getchannel
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
@@ -64,7 +64,6 @@ async def on_ready():
                 if checkchan(channel.name):
                     print(channel.name)
                     addlanguage(conn,channel.name, channel.id)
-    looper.start()
 
 
 
@@ -136,6 +135,9 @@ async def raid(ctx):
         message = "RAID IS BEGINNING: \n https://cuckoo.team/koai"
         await ctx.send(message)
     await ctx.message.delete()
+    getchannel(conn,'accountability')
+    looper.start()
+
 
 
 @bot.command(name="utc",help="yyyy-mm-dd hh:mm timezone:Continent/City - converts to UTC", pass_context=True)
@@ -271,9 +273,15 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=1, count = 25)
 async def looper():
-    print("i")
+    bot.minutes +=1
+    print(bot.minutes)
+
+
+@looper.after_loop
+async def raid_done:
+    print("raid done")
 
 
 

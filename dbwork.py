@@ -289,6 +289,15 @@ def getprefix(conn):
     print(b)
     return b
 
+def getchannel(conn, name):
+    cur = conn.cursor()
+    line1 = "SELECT VAL FROM " + name
+    cur.execute(line1)
+    a = str(cur.fetchone())
+    print(a)
+
+
+
 
 
 
