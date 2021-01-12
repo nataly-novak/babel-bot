@@ -280,8 +280,9 @@ async def on_member_update(before, after):
 async def looper():
 
     print(bot.minutes)
+    chan = getchannel(conn, "accountability")
     if bot.minutes > 0:
-        raider = bot.get_channel(getchannel(conn,"accountability")).fetch_message(bot.raid_id)
+        raider = bot.get_channel(chan).fetch_message(bot.raid_id)
         remain = "RAID HAS "+str(looper.count-1-bot.minutes)+" MINUTES TO GO"
         await raider.edit(content = remain)
     bot.minutes += 1
