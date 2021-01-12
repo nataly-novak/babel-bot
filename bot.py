@@ -139,9 +139,9 @@ async def raid(ctx):
     await ctx.message.delete()
     getchannel(conn,'accountability')
     looper.start()
-    print("sentid" + sent.id)
+    print("sentid" , sent.id)
     bot.raid_id = sent.id
-    print(bot.raid_id+ "WHY")
+    print(bot.raid_id, "WHY")
     await sent.pin()
 
 
