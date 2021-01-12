@@ -61,9 +61,9 @@ async def on_ready():
     print ("With the ID: " + str(bot.user.id))
     for guild in bot.guilds:
         for channel in guild.text_channels:
-                print(channel.name)
                 if checkchan(channel.name):
                     print(channel.name)
+                    addlanguage(conn,channel.name, channel.id)
 
 
 
