@@ -65,5 +65,8 @@ def roletochan(conn, role):
 def checkrole(role):
     return role in roles
 
+def checkchan(chan):
+    return chan in chans
+
 
 

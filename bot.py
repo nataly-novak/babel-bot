@@ -9,7 +9,7 @@ from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
-from languages import checkrole, roletochan, addlanguage, languagedb
+from languages import checkrole, roletochan, addlanguage, languagedb, checkchan
 from randomer import coin, rannum
 
 import os
@@ -52,6 +52,19 @@ bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
 bot.hug_counter = 0
 bot.hug_breaker = 0
+
+@bot.event
+async def on_ready():
+    print ("Booting up your system")
+    print ("I am running on " + bot.user.name)
+    print ("With the ID: " + bot.user.id)
+    for guild in bot.guilds:
+        for channel in guild.channel:
+            if channel.type == "Text":
+                if checkchan(channel.name):
+                    print(channel.name)
+
+
 
 
 @bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
