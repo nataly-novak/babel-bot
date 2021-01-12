@@ -61,7 +61,7 @@ async def on_ready():
     print ("With the ID: " + str(bot.user.id))
     for guild in bot.guilds:
         for channel in guild.channels:
-            if issubclass(channel, discord.TextChannel()):
+            if issubclass(channel, discord.TextChannel):
                 print(channel.name)
                 if checkchan(channel.name):
                     print(channel.name)
