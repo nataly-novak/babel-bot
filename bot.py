@@ -59,7 +59,9 @@ async def on_ready():
     print ("I am running on " + bot.user.name)
     print ("With the ID: " + str(bot.user.id))
     for guild in bot.guilds:
+        print(guild.name)
         for channel in guild.channels:
+            print(channel.name)
             if channel.type == "Text":
                 if checkchan(channel.name):
                     print(channel.name)
