@@ -132,7 +132,7 @@ async def invite(ctx):
 
 
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
-async def raid(ctx, times=25):
+async def raid(ctx, times):
     bot.raidlen = times
     print(bot.raidlen)
     chan = ctx.message.channel.id
