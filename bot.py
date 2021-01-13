@@ -293,7 +293,7 @@ async def looper():
         remain = "```RAID HAS "+str(bot.raidlen-1-bot.minutes)+" MINUTES TO GO```"
         await raider.edit(content = remain)
     bot.minutes += 1
-    if bot.minutes == bot.raidlen:
+    if bot.minutes > bot.raidlen:
         print('DONE')
         looper.stop()
 
