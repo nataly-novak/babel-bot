@@ -286,7 +286,7 @@ async def on_member_update(before, after):
 
 @tasks.loop(minutes=1, count = bot.timer_len+1)
 async def looper():
-
+    print(looper.count)
     print(bot.minutes)
     print(str(bot.raid_id), bot.account_id, "raid")
     channel = bot.get_channel(bot.account_id)
