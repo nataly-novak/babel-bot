@@ -4,7 +4,7 @@ from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
-    setprefix, setdefaults, getprefix, quotenum, getraidlen, setraidlen, raidlendb
+    setprefix, setdefaults, getprefix, quotenum
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
@@ -46,7 +46,7 @@ setdefaults(conn)
 filldb(conn)
 help_items = worddicts()
 languagedb(conn)
-raidlendb(conn)
+
 
 bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
@@ -55,6 +55,7 @@ bot.hug_breaker = 0
 bot.minutes = 0
 bot.raid_id = 0
 bot.account_id = 0
+bot.raidlen = 25
 
 @bot.event
 async def on_ready():
@@ -132,12 +133,12 @@ async def invite(ctx):
 
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
 async def raid(ctx, times=25):
-    setraidlen(conn, times)
-    raid_length = getraidlen(conn)
+    bot.raidlen = 25
+    raid_length = bot.raidlen
     print(raid_length)
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
-        message = "```RAID IS BEGINNING: "+str(raid_length)+ " minutes left```"
+        message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " minutes left```"
         sent = await ctx.send(message)
         print(ctx.message.channel.id)
         bot.account_id = ctx.message.channel.id
@@ -283,9 +284,8 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-@tasks.loop(minutes=1, count=getraidlen(conn)+1)
+@tasks.loop(minutes=1, count=100)
 async def looper():
-    print(looper.count)
     print(bot.minutes)
     print(str(bot.raid_id), bot.account_id, "raid")
     channel = bot.get_channel(bot.account_id)
@@ -294,6 +294,8 @@ async def looper():
         remain = "```RAID HAS "+str(looper.count-1-bot.minutes)+" MINUTES TO GO```"
         await raider.edit(content = remain)
     bot.minutes += 1
+    if bot.minutes > bot.raidlen:
+        looper.stop()
 
 
 @looper.after_loop
