@@ -268,7 +268,7 @@ def getchannel(conn, name):
 
 
 def raidlendb(conn):
-    cur = conn.commit
+    cur = conn.cursor()
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('raidlen',))
     check = (cur.fetchone()[0])
     print(check)
