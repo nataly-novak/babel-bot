@@ -267,6 +267,39 @@ def getchannel(conn, name):
     return int(b)
 
 
+def raidlendb(conn):
+    cur = conn.commit
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('raidlen',))
+    check = (cur.fetchone()[0])
+    print(check)
+    if not check:
+        cur.execute('''CREATE TABLE raidlen (
+                    NMB INT NOT NULL,
+                    TM INT NOT NULL,
+                    );''')
+        print("Table created successfully")
+    else:
+        print('No need')
+    conn.commit()
+
+def setraidlen(conn, val):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM raidlen FETCH FIRST ROW ONLY;")
+    a = str(cur.fetchone())
+    if a == 'None':
+        cur.execute("INSERT INTO raidlen VALUES (0,%s)", (val,))
+    else:
+        cur.execute("UPDATE raidlen SET TM = %s WHERE NMB = 0", (val,))
+    conn.commit()
+
+
+def getraidlen(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT TM FROM raidlen FETCH FIRST ROW ONLY;")
+    a = str(cur.fetchone())
+    b = a[2:-3].rstrip()
+    return int(b)
+
 
 
 

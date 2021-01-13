@@ -1,11 +1,10 @@
 import os
 import random
-raid_length = 25
 from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
-    setprefix, setdefaults, getprefix, quotenum, getchannel
+    setprefix, setdefaults, getprefix, quotenum, getraidlen, setraidlen, raidlendb
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
@@ -47,6 +46,7 @@ setdefaults(conn)
 filldb(conn)
 help_items = worddicts()
 languagedb(conn)
+raidlendb(conn)
 
 bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
@@ -132,8 +132,8 @@ async def invite(ctx):
 
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
 async def raid(ctx, times=25):
-    global raid_length
-    raid_length = times
+    setraidlen(conn, times)
+    raid_length = getraidlen(conn)
     print(raid_length)
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
@@ -283,7 +283,7 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-@tasks.loop(minutes=1, count=raid_length+1)
+@tasks.loop(minutes=1, count=getraidlen(conn)+1)
 async def looper():
     print(looper.count)
     print(bot.minutes)
