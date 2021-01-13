@@ -136,7 +136,7 @@ async def raid(ctx):
     if checksetting(conn, 'accountability', chan):
         message = "RAID IS BEGINNING: "+str(bot.timer_len)+ "minutes left"
         sent = await ctx.send(message)
-    channel = bot.get_channel(ctx.message.channel_id)
+    channel = bot.get_channel(ctx.message.channel.id)
     await ctx.message.delete()
     channel.send("raid")
     looper.start()
