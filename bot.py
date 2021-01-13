@@ -1,6 +1,6 @@
 import os
 import random
-
+raid_length = 25
 from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
@@ -132,7 +132,8 @@ async def invite(ctx):
 
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
 async def raid(ctx, times=25):
-    bot.raid_length = times
+    global raid_length
+    raid_length = times
     print(bot.raid_length)
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
@@ -282,7 +283,7 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-@tasks.loop(minutes=1, count=bot.raid_length+1)
+@tasks.loop(minutes=1, count=raid_length+1)
 async def looper():
     print(looper.count)
     print(bot.minutes)
