@@ -54,7 +54,7 @@ bot.hug_counter = 0
 bot.hug_breaker = 0
 bot.minutes = 0
 bot.raid_id = 0
-bot.timer_len = 5
+bot.timer_len = 0
 bot.account_id = 0
 
 @bot.event
@@ -143,7 +143,7 @@ async def raid(ctx, times=25):
     bot.account_id = ctx.message.channel.id
     channel = bot.get_channel(bot.account_id)
     await ctx.message.delete()
-    looper.start()
+    looper.start(count=times+1)
     print("sentid" , sent.id)
     bot.raid_id = sent.id
     print(bot.raid_id, "WHY")
@@ -284,7 +284,7 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-@tasks.loop(minutes=1, count = bot.timer_len+1)
+@tasks.loop(minutes=1)
 async def looper():
     print(looper.count)
     print(bot.minutes)
