@@ -55,6 +55,7 @@ bot.hug_breaker = 0
 bot.minutes = 0
 bot.raid_id = 0
 bot.timer_len = 5
+account_id = 0
 
 @bot.event
 async def on_ready():
@@ -136,7 +137,9 @@ async def raid(ctx):
     if checksetting(conn, 'accountability', chan):
         message = "RAID IS BEGINNING: "+str(bot.timer_len)+ "minutes left"
         sent = await ctx.send(message)
-    channel = bot.get_channel(ctx.message.channel.id)
+    print(ctx.message.channel.id)
+    account_id = ctx.message.channel.id
+    channel = bot.get_channel(account_id)
     await ctx.message.delete()
     channel.send("raid")
     looper.start()
@@ -284,14 +287,13 @@ async def on_member_update(before, after):
 async def looper():
 
     print(bot.minutes)
-    chan = getchannel(conn, "accountability")
-    print(str(bot.raid_id), chan, "raid")
-    channel = bot.get_channel(chan)
+    print(str(bot.raid_id), account_id, "raid")
+    channel = bot.get_channel(account_id)
     await channel.send("HELP")
-    #if bot.minutes > 0:
-        #raider = bot.get_channel(chan).fetch_message(bot.raid_id)
-        #remain = "RAID HAS "+str(looper.count-1-bot.minutes)+" MINUTES TO GO"
-        #await raider.edit(content = remain)
+    if bot.minutes > 0:
+        raider = channel.fetch_message(bot.raid_id)
+        remain = "RAID HAS "+str(looper.count-1-bot.minutes)+" MINUTES TO GO"
+        await raider.edit(content = remain)
     bot.minutes += 1
 
 
