@@ -27,19 +27,16 @@ def addlanguage(conn, language, id):
     cur = conn.cursor()
     cur.execute("SELECT MAX(NMB) FROM languages;")
     a = str(cur.fetchone())
-    print(a)
     if a == '(None,)':
         ar = 0
     else:
         ar = int(a[1:-2]) + 1
-    print(ar)
     cur.execute("INSERT INTO languages VALUES (%s,%s,%s) ON CONFLICT (LANG) DO UPDATE SET CHAN = excluded.CHAN ;", (ar, language, id))
     conn.commit()
     cur.execute("SELECT NMB,LANG, CHAN from languages")
     rows = cur.fetchall()
     x = 0
     for j in rows:
-        print(j)
         x += 1
 
 def getlanchan(conn, language):

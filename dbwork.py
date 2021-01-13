@@ -33,7 +33,6 @@ def settingsdb(conn):
     conn.commit()
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('discussion',))
     check = (cur.fetchone()[0])
-    print(check)
     if not check:
         cur.execute('''CREATE TABLE discussion (
                 NMB INT NOT NULL,
@@ -46,7 +45,6 @@ def settingsdb(conn):
     conn.commit()
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('quest',))
     check = (cur.fetchone()[0])
-    print(check)
     if not check:
         cur.execute('''CREATE TABLE quest (
                 NMB INT NOT NULL,
@@ -59,7 +57,6 @@ def settingsdb(conn):
     conn.commit()
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('bot',))
     check = (cur.fetchone()[0])
-    print(check)
     if not check:
         cur.execute('''CREATE TABLE bot (
                 NMB INT NOT NULL,
@@ -82,7 +79,6 @@ def makedb(conn):
 
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('inter',))
     check = (cur.fetchone()[0])
-    print(check)
     if not check:
         cur.execute('''CREATE TABLE inter (
         NUM INT  NOT NULL,
@@ -107,13 +103,9 @@ def filldb(conn):
             a.append('')
         cur.execute("INSERT INTO inter VALUES (%s,%s,%s,%s) ON CONFLICT (QUOT) DO NOTHING ;", (cnt, a[0], a[1], a[2]))
         cnt += 1
-        print(cnt)
     cur.execute("SELECT NUM, LANG, QUOT, TRAN from inter")
     rows = cur.fetchall()
-    for j in rows:
-        print(j)
     n = len(f1)
-    print(n)
     f.close()
 
 def addsetting(conn, setting, value):
@@ -127,14 +119,10 @@ def addsetting(conn, setting, value):
     else:
         ar = str(int(a[1:-2]) + 1)
     line1 = "INSERT INTO "+ setting + " VALUES ("+ar+","+value+") ON CONFLICT (VAL) DO NOTHING"
-    print(line1)
-
     cur.execute(line1)
     line2 = "SELECT NMB, VAL from "+setting
     cur.execute(line2)
     rows = cur.fetchall()
-    for j in rows:
-        print(j)
     conn.commit()
 
 
@@ -142,12 +130,10 @@ def addsetting(conn, setting, value):
 def removesetting(conn, setting, value):
     cur = conn.cursor()
     line0 = "SELECT * FROM "+setting+" FETCH FIRST ROW ONLY;"
-    print(line0)
     cur.execute(line0)
     a = str(cur.fetchone())
     b = a[1:-1].split(', ')[1]
     c = b[1:-1]
-    print(c)
     if a != '(None,)':
         leng = len(c)
         v = ''
@@ -156,29 +142,21 @@ def removesetting(conn, setting, value):
                 v+=str(value)[i]
             else:
                 v+=' '
-        print(v)
         line1 = "DELETE FROM "+setting+" WHERE VAL = \'"+value+"\'"
-        print(line1)
         cur.execute(line1)
         line2 = "SELECT NMB, VAL from " + setting
         cur.execute(line2)
         rows = cur.fetchall()
-        for j in rows:
-            print(j)
     conn.commit()
 
 def checksetting(conn, setting, value):
     cur = conn.cursor()
     line0 = "SELECT * FROM " + setting + " FETCH FIRST ROW ONLY;"
-    print(line0)
     cur.execute(line0)
     a = str(cur.fetchone())
-    print("="+a+"=")
     if a.rstrip() != 'None':
         b = a[1:-1].split(', ')[1]
         c = b[1:-1]
-        print(c)
-        print(a)
         leng = len(c)
         v = ''
         for i in range(leng):
@@ -186,7 +164,6 @@ def checksetting(conn, setting, value):
                 v += str(value)[i]
             else:
                 v += ' '
-        print("-"+v+"-")
         line1 = "SELECT NMB FROM "+setting+" WHERE VAL = \'"+v+"\'"
         cur.execute(line1)
         a = str(cur.fetchone())
@@ -203,7 +180,6 @@ def randomquote(conn):
     cur.execute("SELECT MAX(NUM) FROM inter;")
     r = str(cur.fetchone())
     rr = int(r[1:-2])
-    print(rr)
     dd = random.randrange(rr + 1)
     cur.execute("SELECT QUOT FROM inter WHERE NUM = %s", ([dd]))
     resp = str(cur.fetchone())
@@ -214,26 +190,22 @@ def randomquote(conn):
     cur.execute("SELECT LANG FROM inter WHERE NUM = %s", ([dd]))
     resp2 = str(cur.fetchone())
     response = response + ' - ' + resp2[2:-3].strip()
-    print(response)
     return response
 
 def addquote(conn, language, line, trans=""):
     cur = conn.cursor()
     cur.execute("SELECT MAX(NUM) FROM inter;")
     a = str(cur.fetchone())
-    print(a)
     if a == '(None,)':
         ar = 0
     else:
         ar = int(a[1:-2]) + 1
-    print(ar)
     cur.execute("INSERT INTO inter VALUES (%s,%s,%s,%s) ON CONFLICT (QUOT) DO NOTHING ;", (ar, language, line, trans))
     conn.commit()
     cur.execute("SELECT NUM, QUOT, TRAN from inter")
     rows = cur.fetchall()
     x = 0
     for j in rows:
-        print(j)
         x+=1
     return "we have "+str(x) +" quotes so far"
 
@@ -241,14 +213,12 @@ def removelast(conn):
     cur = conn.cursor()
     cur.execute("SELECT MAX(NUM) FROM inter;")
     a = int(str(cur.fetchone())[1:-2])
-    print(a)
     cur.execute("DELETE FROM inter WHERE NUM = %s;", ([a]))
     conn.commit()
     cur.execute("SELECT NUM, QUOT, TRAN from inter")
     rows = cur.fetchall()
     x = 0
     for j in rows:
-        print(j)
         x+=1
     return "we have " + str(x) + " quotes so far"
 
@@ -286,7 +256,6 @@ def getprefix(conn):
     cur.execute("SELECT VAL FROM settingspref FETCH FIRST ROW ONLY;")
     a = str(cur.fetchone())
     b = a[2:-3].rstrip()
-    print(b)
     return b
 
 def getchannel(conn, name):

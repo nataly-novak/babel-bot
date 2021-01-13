@@ -55,7 +55,7 @@ bot.hug_breaker = 0
 bot.minutes = 0
 bot.raid_id = 0
 bot.timer_len = 5
-account_id = 0
+bot.account_id = 0
 
 @bot.event
 async def on_ready():
@@ -287,8 +287,8 @@ async def on_member_update(before, after):
 async def looper():
 
     print(bot.minutes)
-    print(str(bot.raid_id), account_id, "raid")
-    channel = bot.get_channel(account_id)
+    print(str(bot.raid_id), bot.account_id, "raid")
+    channel = bot.get_channel(bot.account_id)
     await channel.send("HELP")
     if bot.minutes > 0:
         raider = channel.fetch_message(bot.raid_id)
