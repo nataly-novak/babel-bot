@@ -132,8 +132,8 @@ async def invite(ctx):
 
 
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
-async def raid(ctx, time = 25):
-    bot.timer_len = time
+async def raid(ctx, times=25):
+    bot.timer_len = times
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
         message = "```RAID IS BEGINNING: "+str(bot.timer_len)+ "minutes left```"
@@ -142,7 +142,6 @@ async def raid(ctx, time = 25):
     bot.account_id = ctx.message.channel.id
     channel = bot.get_channel(bot.account_id)
     await ctx.message.delete()
-    channel.send("raid")
     looper.start()
     print("sentid" , sent.id)
     bot.raid_id = sent.id
