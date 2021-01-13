@@ -137,7 +137,7 @@ async def raid(ctx, times=25):
     print(raid_length)
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
-        message = "```RAID IS BEGINNING: "+str(bot.raid_length)+ " minutes left```"
+        message = "```RAID IS BEGINNING: "+str(raid_length)+ " minutes left```"
         sent = await ctx.send(message)
         print(ctx.message.channel.id)
         bot.account_id = ctx.message.channel.id
