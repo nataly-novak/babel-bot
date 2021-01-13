@@ -283,7 +283,7 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-@tasks.loop(minutes=1, count=bot.raid_legth+1)
+@tasks.loop(minutes=1, count=bot.raid_length+1)
 async def looper():
     print(looper.count)
     print(bot.minutes)
