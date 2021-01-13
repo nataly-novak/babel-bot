@@ -54,7 +54,7 @@ bot.hug_counter = 0
 bot.hug_breaker = 0
 bot.minutes = 0
 bot.raid_id = 0
-bot.timer_len = 0
+bot.raid_length = 25
 bot.account_id = 0
 
 @bot.event
@@ -133,21 +133,20 @@ async def invite(ctx):
 
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
 async def raid(ctx, times=25):
-    bot.timer_len = times
-    print(bot.timer_len)
+    bot.raid_length = times
+    print(bot.raid_length)
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
-        message = "```RAID IS BEGINNING: "+str(bot.timer_len)+ "minutes left```"
+        message = "```RAID IS BEGINNING: "+str(bot.raid_length)+ " minutes left```"
         sent = await ctx.send(message)
-    print(ctx.message.channel.id)
-    bot.account_id = ctx.message.channel.id
-    channel = bot.get_channel(bot.account_id)
-    await ctx.message.delete()
-    looper.start(count=times+1)
-    print("sentid" , sent.id)
-    bot.raid_id = sent.id
-    print(bot.raid_id, "WHY")
-    await sent.pin()
+        print(ctx.message.channel.id)
+        bot.account_id = ctx.message.channel.id
+        await ctx.message.delete()
+        looper.start()
+        print("sentid" , sent.id)
+        bot.raid_id = sent.id
+        print(bot.raid_id, "WHY")
+        await sent.pin()
 
 
 
@@ -284,7 +283,7 @@ async def on_member_update(before, after):
                 await channel.send("{0} joined {1}".format(after.mention, channel.mention))
 
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=1, count=bot.raid_legth+1)
 async def looper():
     print(looper.count)
     print(bot.minutes)
