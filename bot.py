@@ -54,7 +54,6 @@ bot.hug_counter = 0
 bot.hug_breaker = 0
 bot.minutes = 0
 bot.raid_id = 0
-bot.raid_length = 25
 bot.account_id = 0
 
 @bot.event
