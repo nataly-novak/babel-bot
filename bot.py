@@ -134,7 +134,7 @@ async def invite(ctx):
 async def raid(ctx, times=25):
     global raid_length
     raid_length = times
-    print(bot.raid_length)
+    print(raid_length)
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
         message = "```RAID IS BEGINNING: "+str(bot.raid_length)+ " minutes left```"
