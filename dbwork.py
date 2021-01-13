@@ -275,7 +275,7 @@ def raidlendb(conn):
     if not check:
         cur.execute('''CREATE TABLE raidlen (
                     NMB INT NOT NULL,
-                    TM INT NOT NULL,
+                    TM INT NOT NULL
                     );''')
         print("Table created successfully")
     else:
