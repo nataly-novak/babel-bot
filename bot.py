@@ -56,7 +56,6 @@ maketimetable(conn)
 
 bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
-bot.guildone = bot.guilds[0]
 bot.hug_counter = 0
 bot.hug_breaker = 0
 bot.minutes = 0
@@ -69,12 +68,10 @@ bot.raidstatus = 0
 bot.raid_members = []
 bot.eventchan = 0
 bot.common = 0
-bot.eventrole = get(bot.guildone.roles, name = "Events")
 
 
 @bot.event
 async def on_ready():
-    print(bot.guildone)
     print ("Booting up your system")
     print ("I am running on " + bot.user.name)
     print ("With the ID: " + str(bot.user.id))
@@ -90,10 +87,7 @@ async def on_ready():
             elif channel.name == "common-room":
                 print(channel.id)
                 bot.commonchan = channel.id
-        for role in guild.roles:
-            if role.name == "Events":
-                print(role.name)
-                bot.eventrole = role
+
     updater.start()
 
 
@@ -496,7 +490,7 @@ async def updater():
             remevent(conn,i)
     print(message)
     if message != "":
-        message = bot.eventrole.mention+"\n```CLOSEST EVENTS```\n"+message
+        message = "```CLOSEST EVENTS```\n"+message
         await announcements.send(message)
 
 
