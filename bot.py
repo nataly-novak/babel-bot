@@ -490,7 +490,7 @@ async def updater():
             remevent(conn,i[0])
     print(message)
     if message != "":
-        message = "```CLOSEST EVENTS```\n"+message
+        message = "@Events \n```CLOSEST EVENTS```\n"+message
         await announcements.send(message)
 
 
