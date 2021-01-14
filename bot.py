@@ -68,6 +68,7 @@ bot.raidstatus = 0
 bot.raid_members = []
 bot.eventchan = 0
 bot.common = 0
+bot.evrole = []
 
 
 @bot.event
@@ -87,6 +88,10 @@ async def on_ready():
             elif channel.name == "common-room":
                 print(channel.id)
                 bot.commonchan = channel.id
+        for role in guild.roles:
+            if role.name == "Event":
+                bot.evrole.append(role)
+        print(bot.evrole[0].id)
 
     updater.start()
 
@@ -490,7 +495,7 @@ async def updater():
             remevent(conn,i[0])
     print(message)
     if message != "":
-        message = "@Events \n```CLOSEST EVENTS```\n"+message
+        message = bot.evrole[0].mention +""\n```CLOSEST EVENTS```\n"+message
         await announcements.send(message)
 
 
