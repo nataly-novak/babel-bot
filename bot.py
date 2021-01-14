@@ -89,7 +89,8 @@ async def on_ready():
                 print(channel.id)
                 bot.commonchan = channel.id
         for role in guild.roles:
-            print("-" + role.name+ "-")
+            line = str(role.name)
+            print(line)
             if str(role.name) == "Event":
                 print(role.name)
                 bot.evrole.append(role)
