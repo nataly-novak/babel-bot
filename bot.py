@@ -91,6 +91,7 @@ async def on_ready():
         for role in guild.roles:
             print(role.name)
             if role.name == "Event":
+                print(role.name)
                 bot.evrole.append(role)
         print(bot.evrole[0].id)
 
