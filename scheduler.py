@@ -30,7 +30,7 @@ def addevent(conn, day, clock, chan, name):
         else:
             ar = int(a[1:-2]) + 1
         line = "INSERT INTO timetable VALUES ("+str(ar)+","+day+","+clock+",\""+chan+"\","+"\""+name+"\")"
-        print(line)
+        cur.execute(line)
         conn.commit()
         cur.execute("SELECT NMB,DAY, CLOCK, CHAN, NAME from timetable")
         rows = cur.fetchall()
