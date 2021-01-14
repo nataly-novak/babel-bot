@@ -341,7 +341,7 @@ async def raid_done():
         await channel.send ("RAID DONE!")
     else:
         await channel.send ("BREAK DONE!")
-    sent = channel.fetch_message(bot.raid_id)
+    sent = await channel.fetch_message(bot.raid_id)
     print(sent.content)
     await sent.unpin()
     bot.on_raid = False
