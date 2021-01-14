@@ -439,7 +439,7 @@ async def schedule(ctx, zone = "UTC"):
     if message == "":
         message = "```No events next week, sorry```"
     else:
-        message = "```THIS IS THIS WEEK'S SCHEDULE\n"+message+"```"
+        message = "```THIS IS THIS WEEK'S SCHEDULE```\n"+message
     await ctx.send(message)
 
 
