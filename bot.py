@@ -164,15 +164,18 @@ async def breaks(ctx, times = '5'):
     if checksetting(conn, 'accountability', chan):
         if bot.on_raid == False:
             bot.raidlen = int(times)
-            message = "```BREAK WAS STARTED: "+str(bot.raidlen) + " MINUTES LEFT```"
+            message = "```WAITING FOR BREAK OF " + times + " MINUTES TO START.....```"
             sent = await ctx.send(message)
             bot.account_id = ctx.message.channel.id
             await ctx.message.delete()
-            looper.start()
             bot.raid_id = sent.id
             await sent.pin()
             bot.on_raid = True
             bot.raidbreak = False
+            await sent.add_reaction("🛏️")
+            await sent.add_reaction("💤")
+            bot.raidstatus = 1
+
         else:
             message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
             await ctx.send(message)
@@ -268,6 +271,16 @@ async def on_raw_reaction_add(payload):
             remain = "```RAID IS BEGINNING: "+str(bot.raidlen-bot.minutes+1)+" MINUTES TO GO```"
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
+            bot.raid_members.append(payload.member.id)
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "💤" and payload.member.bot == False:
+            print("it's alive")
+            looper.start()
+            bot.raidstatus = 2
+            channel = bot.get_channel(bot.account_id)
+            raider = await channel.fetch_message(bot.raid_id)
+            remain = "```BREAK WAS STARTED: " + str(bot.raidlen - bot.minutes + 1) + " MINUTES REMAINING```"
+            await raider.edit(content=remain)
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛏️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
 
 
@@ -365,11 +378,19 @@ async def raid_done():
         bot.raid_members = []
 
     else:
-        await channel.send ("BREAK DONE!")
+        message = "BREAK FINISHED!!!\n Let's go back to work, "
+        for user in bot.raid_members:
+            member = await bot.fetch_user(user)
+            name = member.mention
+            message = message + name + ", "
+        message = message[:-2] + "!"
+        await channel.send(message)
+        bot.raid_members = []
     sent = await channel.fetch_message(bot.raid_id)
     print(sent.content)
     await sent.unpin()
     bot.on_raid = False
+    bot.raidstatus = 0
 
 
 
