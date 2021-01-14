@@ -76,15 +76,16 @@ async def on_ready():
     print ("With the ID: " + str(bot.user.id))
     for guild in bot.guilds:
         for channel in guild.text_channels:
-                if checkchan(channel.name):
-                    print(channel.name)
-                    addlanguage(conn,channel.name, channel.id)
-                elif channel.name == "event-announcements":
-                    print(channel.id)
-                    bot.eventchan = channel.id
-                elif channel.name == "event-announcements":
-                    print(channel.id)
-                    bot.commonchan = channel.id
+            print(channel.name)
+            if checkchan(channel.name):
+                print(channel.name)
+                addlanguage(conn,channel.name, channel.id)
+            elif channel.name == "event-announcements":
+                print(channel.id)
+                bot.eventchan = channel.id
+            elif channel.name == "common-room":
+                print(channel.id)
+                bot.commonchan = channel.id
         for role in guild.roles:
             if role.name == "Events":
                 print(role.name)
