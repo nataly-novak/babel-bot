@@ -440,7 +440,10 @@ async def schedule(ctx, zone = "UTC"):
     for i in ev:
         print(i)
         if i[1] in date_list:
-            channel = bot.get_channel(i[3])
+            if i[3] != -1:
+                channel = bot.get_channel(i[3])
+            else:
+                channel = discord.utils.get(ctx.guild.channels, name='common-room')
             line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
             message += line
     if message == "":
