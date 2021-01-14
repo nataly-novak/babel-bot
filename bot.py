@@ -57,6 +57,7 @@ bot.raid_id = 0
 bot.account_id = 0
 bot.raidlen = 25
 bot.on_raid = False
+bot.raidbreak = True
 
 @bot.event
 async def on_ready():
@@ -138,20 +139,37 @@ async def raid(ctx, times = '25'):
     if checksetting(conn, 'accountability', chan):
         if bot.on_raid == False:
             bot.raidlen = int(times)
-            print(bot.raidlen)
-            message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " minutes left```"
+            if bot.raidbreak:
+                message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " minutes left```"
             sent = await ctx.send(message)
-            print(ctx.message.channel.id)
             bot.account_id = ctx.message.channel.id
             await ctx.message.delete()
             looper.start()
-            print("sentid" , sent.id)
             bot.raid_id = sent.id
-            print(bot.raid_id, "WHY")
             await sent.pin()
             bot.on_raid = True
         else:
-            message = "YOU ARE ALREADY RAIDING, SEE PINNED MESSAGES"
+            message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
+            await ctx.send(message)
+            await ctx.message.delete()
+
+@bot.command(name='break',help='prints link to raid room',pass_context=True)
+async def raid(ctx, times = '5'):
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'accountability', chan):
+        if bot.on_raid == False:
+            bot.raidlen = int(times)
+            if bot.raidbreak:
+                message = "```BREAK WAS STARTED: "+str(bot.raidlen) + " MINUTES LEFT```"
+            sent = await ctx.send(message)
+            bot.account_id = ctx.message.channel.id
+            await ctx.message.delete()
+            looper.start()
+            bot.raid_id = sent.id
+            await sent.pin()
+            bot.on_raid = False
+        else:
+            message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
             await ctx.send(message)
             await ctx.message.delete()
 
@@ -301,7 +319,14 @@ async def looper():
     channel = bot.get_channel(bot.account_id)
     if bot.minutes > 0:
         raider = await channel.fetch_message(bot.raid_id)
-        remain = "```RAID HAS "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
+        if (bot.raidlen-bot.minutes) != 1:
+            mins = " MINUTES"
+        else:
+            mins = " MINUTE"
+        if bot.raidbreak:
+            remain = "```RAID HAS "+str(bot.raidlen-bot.minutes)+mins+" TO GO```"
+        else:
+            remain = "```BOT HAS "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
         await raider.edit(content = remain)
     bot.minutes += 1
 
@@ -312,8 +337,12 @@ async def raid_done():
     print("raid done")
     bot.minutes = 0
     channel = bot.get_channel(bot.account_id)
-    await channel.send ("RAID DONE!")
+    if bot.raidbreak:
+        await channel.send ("RAID DONE!")
+    else:
+        await channel.send ("BREAK DONE!")
     sent = channel.fetch_message(bot.raid_id)
+    print(sent.content)
     await sent.unpin()
     bot.on_raid = False
 
