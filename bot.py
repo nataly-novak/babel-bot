@@ -1,5 +1,6 @@
 import os
 import random
+
 from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
@@ -65,6 +66,8 @@ bot.on_raid = False
 bot.raidbreak = True
 bot.raidstatus = 0
 bot.raid_members = []
+bot.eventchan = 0
+bot.common = 0
 
 @bot.event
 async def on_ready():
@@ -76,6 +79,18 @@ async def on_ready():
                 if checkchan(channel.name):
                     print(channel.name)
                     addlanguage(conn,channel.name, channel.id)
+                elif channel.name == "event-announcements":
+                    print(channel.id)
+                    bot.eventchan = channel.id
+                elif channel.name == "event-announcements":
+                    print(channel.id)
+                    bot.commonchan = channel.id
+        for role in guild.roles:
+            if role.name == "Events":
+                print(role.name)
+                bot.eventrole = role
+    updater.start()
+
 
 
 
@@ -412,7 +427,6 @@ async def event(ctx, day="", time="", channel="", name=""):
         ev = geteventlist(conn)
         message = ""
         for i in ev:
-            channel = bot.get_channel(i[3])
             line = str(i[0])+": "+str(i[1])+" "+str(i[2]).rsplit(sep=':',maxsplit=1)[0]+" "+ str(i[3]) + " "+i[4]+"\n"
             message += line
         await ctx.send(message)
@@ -451,6 +465,32 @@ async def schedule(ctx, zone = "UTC"):
     else:
         message = "```THIS IS THIS WEEK'S SCHEDULE```\n"+message
     await ctx.send(message)
+
+@tasks.loop(hours=24)
+async def updater():
+    announcements = bot.get_channel(bot.eventchan)
+    message = ""
+    ev = convertlist(conn, geteventlist(conn), 'UTC')
+    today = getToday('UTC')
+    toddate = datetime.datetime.strptime(today, "%Y-%m-%d")
+    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(2)]
+    date_list = []
+    for i in stamp_list:
+        date_list.append(i.date())
+    print(date_list)
+    for i in ev:
+        print(i)
+        if i[1] in date_list:
+            if i[3] != -1:
+                channel = bot.get_channel(i[3])
+            else:
+                channel = bot.get_channel(bot.common)
+            line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
+            message += line
+    if message != "":
+        message = bot.eventrole.mention+"\n```CLOSEST EVENTS```\n"+message
+        await announcements.send(message)
+
 
 
 
