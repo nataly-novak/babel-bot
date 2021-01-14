@@ -140,7 +140,7 @@ async def raid(ctx, times = '25'):
         if bot.on_raid == False:
             bot.raidlen = int(times)
             if bot.raidbreak:
-                message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " minutes left```"
+                message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " MINUTES LEFT```"
             sent = await ctx.send(message)
             bot.account_id = ctx.message.channel.id
             await ctx.message.delete()
@@ -154,7 +154,7 @@ async def raid(ctx, times = '25'):
             await ctx.message.delete()
 
 @bot.command(name='break',help='prints link to raid room',pass_context=True)
-async def raid(ctx, times = '5'):
+async def breaks(ctx, times = '5'):
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
         if bot.on_raid == False:
