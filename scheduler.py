@@ -1,5 +1,7 @@
 import psycopg2
 from languages import getlanchan
+import pytz
+import datetime
 
 def maketimetable(conn):
     cur = conn.cursor()
@@ -43,18 +45,33 @@ def addevent(conn, day, clock, chan, name):
 def geteventlist(conn):
     eventlist = []
     cur = conn.cursor()
-    cur.execute("SELECT NMB,DAY, CLOCK, CHAN, NAME from timetable")
+    cur.execute("SELECT NMB,DAY, CLOCK, CHAN, NAME from  timetable order by DAY,CLOCK")
     rows = cur.fetchall()
     for i in rows:
         a = []
         for j in i:
             a.append(j)
-
         a[3] = getlanchan(conn, a[3].strip('\' '))
         a[4] = a[4].strip('\' ')
         print(a)
         eventlist.append(a)
     return eventlist
+
+def convertlist(eventlist, timezone):
+    utc_time = pytz.timezone("UTC")
+    converted = []
+    for i in eventlist:
+        day = str(i[1])
+        clock = str(i[2])
+        dt = day + " " +clock
+        naive_datetime = datetime.datetime.strptime(dt, "%Y-%m-%d %H:%M:%S")
+        utc_datetime = utc_time.localize(naive_datetime, is_dst=None)
+        local_datetime = utc_datetime.astimezone(timezone)
+        i[1] = local_datetime.date()
+        i[2] = local_datetime.time()
+        converted.append(local_datetime)
+
+
 
 
 
