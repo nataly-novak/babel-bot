@@ -141,7 +141,7 @@ async def raid(ctx, times = '25'):
     if checksetting(conn, 'accountability', chan):
         if bot.on_raid == False:
             bot.raidlen = int(times)
-            message = "```WAITING FOR RAID TO START.....```"
+            message = "```WAITING FOR RAID OF " +times+  " MINUTES TO START.....```"
             sent = await ctx.send(message)
             bot.account_id = ctx.message.channel.id
             await ctx.message.delete()
@@ -358,9 +358,9 @@ async def raid_done():
         message = "RAID DONE!!!\n Congratulations to "
         for user in bot.raid_members:
             member = await bot.fetch_user(user)
-            name = member.name
+            name = member.mention
             message = message + name +", "
-            message = message[:-2]+"!"
+        message = message[:-2]+"!"
         await channel.send (message)
         bot.raid_members = []
 
