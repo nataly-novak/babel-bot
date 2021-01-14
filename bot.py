@@ -59,6 +59,7 @@ bot.raidlen = 25
 bot.on_raid = False
 bot.raidbreak = True
 bot.raidstatus = 0
+bot.raid_members = []
 
 @bot.event
 async def on_ready():
@@ -264,8 +265,11 @@ async def on_raw_reaction_add(payload):
             bot.raidstatus = 2
             channel = bot.get_channel(bot.account_id)
             raider = await channel.fetch_message(bot.raid_id)
-            remain = "```RAID IS BEGINNING: "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
+            remain = "```RAID IS BEGINNING: "+str(bot.raidlen-bot.minutes+1)+" MINUTES TO GO```"
             await raider.edit(content=remain)
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
+            bot.raid_members.append(payload.member.id)
+
 
 
 @bot.event
@@ -351,7 +355,15 @@ async def raid_done():
     bot.minutes = 0
     channel = bot.get_channel(bot.account_id)
     if bot.raidbreak:
-        await channel.send ("RAID DONE!")
+        message = "RAID DONE!!!\n Congratulations to "
+        for user in bot.raid_members:
+            member = await bot.fetch_user(user)
+            name = member.name
+            message = message + name +", "
+            message = message[:-2]+"!"
+        await channel.send (message)
+        bot.raid_members = []
+
     else:
         await channel.send ("BREAK DONE!")
     sent = await channel.fetch_message(bot.raid_id)
