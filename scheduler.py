@@ -46,7 +46,9 @@ def geteventlist(conn):
     cur.execute("SELECT NMB,DAY, CLOCK, CHAN, NAME from timetable")
     rows = cur.fetchall()
     for i in rows:
-        a =i.split(sep=", ")
+        a = []
+        for j in i:
+            a.append(j)
         a[1] = a[1][:-1].split(sep="(")[1].split(sep=", ")
         a[2] = a[2][:-1].split(sep="(")[1].split(sep = ", ")
         a[3] = getlanchan(conn, a[3].strip('\' '))
