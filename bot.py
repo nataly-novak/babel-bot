@@ -407,7 +407,7 @@ async def raid_done():
 async def event(ctx, day="", time="", channel="", name=""):
     if day != "" and time != "" and channel != "" and name !="":
         num = addevent(conn,day, time, channel, name)
-        await ctx.send("Your event ticket is " + num + ", please keep it for the case of canceling it")
+        await ctx.send("Your event ticket is " + str(num) + ", please keep it for the case of canceling it")
     elif day == "" and time == "" and channel == "" and name =="":
         ev = geteventlist(conn)
         message = ""
@@ -422,7 +422,7 @@ async def event(ctx, day="", time="", channel="", name=""):
 @bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True)
 async def schedule(ctx, zone = "UTC"):
     ev = convertlist(geteventlist(conn),zone)
-    message = "!"
+    message = ""
     today = getToday(zone)
     toddate = datetime.datetime.strptime(today,"%Y-%m-%d")
     stamp_list = [toddate + datetime.timedelta(days=x) for x in range(7)]
@@ -436,6 +436,10 @@ async def schedule(ctx, zone = "UTC"):
             channel = bot.get_channel(i[3])
             line = str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
             message += line
+    if message == "":
+        message = "```No events next week, sorry```"
+    else:
+        message = "```THIS IS THIS WEEK'S SCHEDULE\n"+message+"```"
     await ctx.send(message)
 
 
