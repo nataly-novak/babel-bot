@@ -91,7 +91,7 @@ async def on_ready():
         for role in guild.roles:
             line = str(role.name)
             print(line)
-            if line == "Event":
+            if line == "Events":
                 print("!!!!!")
                 print(role.name)
                 bot.evrole.append(role)
