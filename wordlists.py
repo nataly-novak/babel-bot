@@ -41,11 +41,9 @@ def getgroups(conn, id):
 
 def getreaction(conn, message, id):
     names = getgroups(conn, id)
-    print(names)
     emotes = []
     for name in names:
         if name != 'none':
-            print(name)
             emo = checkline(message, name)
             for j in emo:
                 emotes.append(j)
@@ -72,7 +70,6 @@ def help(help, item):
     else:
         return "I do not have information about this word. Please ask the members of the server for support. I only know about: "+ themes
 
-print(help(worddicts(),"koai"))
 
 
 

@@ -44,7 +44,6 @@ def getlanchan(conn, language):
     cur.execute("SELECT CHAN FROM languages WHERE LANG = %s", (language,))
     resp = str(cur.fetchone())
     chan = resp[2:-3].strip()
-    print(chan)
     if chan != "":
         id = int(chan)
     else:
@@ -55,7 +54,6 @@ def roletochan(conn, role):
     n = roles.index(role)
     a = chans[n]
     item = a.ljust(30)
-    print(item)
     return getlanchan(conn, item)
 
 
