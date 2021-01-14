@@ -41,6 +41,7 @@ def addevent(conn, day, clock, chan, name):
         for j in rows:
             x += 1
             print(j)
+        return ar
 
 def geteventlist(conn):
     eventlist = []

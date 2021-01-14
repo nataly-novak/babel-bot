@@ -21,6 +21,7 @@ load_dotenv()
 STAGE = os.getenv('STAGE')
 TOKEN = os.getenv('TOKEN')
 ADMIN_ROLE = os.getenv('ADMIN_ROLE')
+EVENT = os.getenv('EVENT')
 if STAGE == 'dev':
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -400,14 +401,25 @@ async def raid_done():
 
 
 @bot.command(name = "event", help = "Adds an event",pass_context=True)
-async def event(ctx, zone = "UTC", day="", time="", channel="", name=""):
+@commands.has_role(ADMIN_ROLE, EVENT)
+async def event(ctx, day="", time="", channel="", name=""):
     if day != "" and time != "" and channel != "" and name !="":
-        addevent(conn,day, time, channel, name)
+        num = addevent(conn,day, time, channel, name)
+        await ctx.send("Your event ticket is " + num + ", please keep it for the case of canceling it")
     elif day == "" and time == "" and channel == "" and name =="":
-        if zone == 'UTC':
-            geteventlist(conn)
-        else:
-            convertlist(geteventlist(conn), zone)
+        ev = geteventlist(conn)
+        message = ""
+        for i in ev:
+            channel = bot.get_channel(i[3])
+            line = str(i[0])+": "+str(i[1])+" "+str(i[2])+ channel.mention + " "+i[4]+"\n"
+            message += line
+        await ctx.send(message)
+
+
+
+@bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True):
+async def schedule(zone = "UTC"):
+    convertlist(geteventlist(conn),zone)
 
 
 
