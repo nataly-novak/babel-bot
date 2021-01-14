@@ -58,6 +58,7 @@ bot.account_id = 0
 bot.raidlen = 25
 bot.on_raid = False
 bot.raidbreak = True
+bot.raidstatus = 0
 
 @bot.event
 async def on_ready():
@@ -139,8 +140,7 @@ async def raid(ctx, times = '25'):
     if checksetting(conn, 'accountability', chan):
         if bot.on_raid == False:
             bot.raidlen = int(times)
-            if bot.raidbreak:
-                message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " MINUTES LEFT```"
+            message = "```WAITING FOR RAID TO START.....```"
             sent = await ctx.send(message)
             bot.account_id = ctx.message.channel.id
             await ctx.message.delete()
@@ -149,6 +149,10 @@ async def raid(ctx, times = '25'):
             await sent.pin()
             bot.on_raid = True
             bot.raidbreak = True
+            sent.add_reaction("🗡")
+            sent.add_reaction("⚔")
+            bot.raidstatus = 1
+
         else:
             message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
             await ctx.send(message)
@@ -160,8 +164,7 @@ async def breaks(ctx, times = '5'):
     if checksetting(conn, 'accountability', chan):
         if bot.on_raid == False:
             bot.raidlen = int(times)
-            if bot.raidbreak:
-                message = "```BREAK WAS STARTED: "+str(bot.raidlen) + " MINUTES LEFT```"
+            message = "```BREAK WAS STARTED: "+str(bot.raidlen) + " MINUTES LEFT```"
             sent = await ctx.send(message)
             bot.account_id = ctx.message.channel.id
             await ctx.message.delete()
@@ -252,9 +255,17 @@ async def ran(ctx, number, amount = 1):
 async def on_raw_reaction_add(payload):
     chan = payload.channel_id
     print(checksetting(conn,'accountability', chan))
-    if checksetting(conn,'accountability', chan) and payload.emoji.name == "📌":
-        msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-        await msg.pin()
+    if checksetting(conn,'accountability', chan):
+        if payload.emoji.name == "📌":
+            msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+            await msg.pin()
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "⚔" and payload.member.bot == False:
+            looper.start()
+            bot.raidstatus = 2
+            channel = bot.get_channel(bot.account_id)
+            raider = await channel.fetch_message(bot.raid_id)
+            remain = "```RAID IS BEGINNING: "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
+            await raider.edit(content=remain)
 
 
 @bot.event
