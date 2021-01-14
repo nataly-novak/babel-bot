@@ -57,7 +57,8 @@ def geteventlist(conn):
         eventlist.append(a)
     return eventlist
 
-def convertlist(eventlist, timezone):
+def convertlist(eventlist, zone):
+    timezone = pytz.timezone(zone.rstrip())
     utc_time = pytz.timezone("UTC")
     converted = []
     for i in eventlist:
