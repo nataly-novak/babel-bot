@@ -1,4 +1,5 @@
 import psycopg2
+from languages import getlanchan
 
 def maketimetable(conn):
     cur = conn.cursor()
@@ -38,3 +39,24 @@ def addevent(conn, day, clock, chan, name):
         for j in rows:
             x += 1
             print(j)
+
+def geteventlist(conn):
+    eventlist = []
+    cur = conn.cursor()
+    cur.execute("SELECT NMB,DAY, CLOCK, CHAN, NAME from timetable")
+    rows = cur.fetchall()
+    for i in rows:
+        a =i.split(sep=", ")
+        a[1] = a[1][:-1].split(sep="(")[1].split(sep=", ")
+        a[2] = a[2][:-1].split(sep="(")[1].split(sep = ", ")
+        a[3] = getlanchan(conn, a[3].strip('\' '))
+        a[4] = a[4].strip('\' ')
+        print(a)
+        eventlist.append(a)
+    return eventlist
+
+
+
+
+
+

@@ -10,7 +10,7 @@ from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 from languages import checkrole, roletochan, addlanguage, languagedb, checkchan
 from randomer import coin, rannum
-from scheduler import maketimetable, addevent
+from scheduler import maketimetable, addevent, geteventlist
 
 import os
 import psycopg2
@@ -401,7 +401,10 @@ async def raid_done():
 
 @bot.command(name = "event", help = "Adds an event",pass_context=True)
 async def event(ctx, day, time, channel, name):
-    addevent(conn,day, time, channel, name)
+    if day != "" and time != "" and channel != "" and name !="":
+        addevent(conn,day, time, channel, name)
+    elif day == "" and time == "" and channel == "" and name =="":
+        geteventlist()
 
 
 
