@@ -293,7 +293,7 @@ async def looper():
     channel = bot.get_channel(bot.account_id)
     if bot.minutes > 0:
         raider = await channel.fetch_message(bot.raid_id)
-        remain = "```RAID HAS "+str(bot.raidlen-1-bot.minutes)+" MINUTES TO GO```"
+        remain = "```RAID HAS "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
         await raider.edit(content = remain)
     bot.minutes += 1
 
