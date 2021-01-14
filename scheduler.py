@@ -79,7 +79,7 @@ def convertlist(conn, eventlist, zone):
 
 def remevent(conn, ticket):
     cur = conn.cursor()
-    cur.execute("DELETE FROM timetable WHERE NMB = %s",(ticket))
+    cur.execute("DELETE FROM timetable WHERE NMB = %s",(ticket, ))
     conn.commit()
 
 
