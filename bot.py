@@ -487,7 +487,7 @@ async def updater():
             line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
             message += line
         elif i[1]<toddate.date():
-            remevent(conn,i)
+            remevent(conn,i[0])
     print(message)
     if message != "":
         message = "```CLOSEST EVENTS```\n"+message
