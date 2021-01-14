@@ -417,7 +417,7 @@ async def event(ctx, day="", time="", channel="", name=""):
 
 
 
-@bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True):
+@bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True)
 async def schedule(zone = "UTC"):
     convertlist(geteventlist(conn),zone)
 
