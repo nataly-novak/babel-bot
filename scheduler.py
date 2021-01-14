@@ -49,8 +49,7 @@ def geteventlist(conn):
         a = []
         for j in i:
             a.append(j)
-        a[1] = a[1][:-1].split(sep="(")[1].split(sep=", ")
-        a[2] = a[2][:-1].split(sep="(")[1].split(sep = ", ")
+
         a[3] = getlanchan(conn, a[3].strip('\' '))
         a[4] = a[4].strip('\' ')
         print(a)
