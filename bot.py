@@ -56,6 +56,7 @@ maketimetable(conn)
 
 bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
+bot.guildone = bot.guilds[0]
 bot.hug_counter = 0
 bot.hug_breaker = 0
 bot.minutes = 0
@@ -68,11 +69,12 @@ bot.raidstatus = 0
 bot.raid_members = []
 bot.eventchan = 0
 bot.common = 0
-bot.eventrole = get(bot.guilds.roles, name = "Events")
+bot.eventrole = get(bot.guildone.roles, name = "Events")
 
 
 @bot.event
 async def on_ready():
+    print(bot.guildone)
     print ("Booting up your system")
     print ("I am running on " + bot.user.name)
     print ("With the ID: " + str(bot.user.id))
