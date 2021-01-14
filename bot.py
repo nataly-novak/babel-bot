@@ -302,6 +302,7 @@ async def looper():
 @looper.after_loop
 async def raid_done():
     print("raid done")
+    bot.minutes = 0
     channel = bot.get_channel(bot.account_id)
     await channel.send ("RAID DONE!")
 
