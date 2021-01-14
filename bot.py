@@ -56,6 +56,7 @@ bot.minutes = 0
 bot.raid_id = 0
 bot.account_id = 0
 bot.raidlen = 25
+bot.on_raid = False
 
 @bot.event
 async def on_ready():
@@ -137,16 +138,21 @@ async def raid(ctx, times = '25'):
     print(bot.raidlen)
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
-        message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " minutes left```"
-        sent = await ctx.send(message)
-        print(ctx.message.channel.id)
-        bot.account_id = ctx.message.channel.id
-        await ctx.message.delete()
-        looper.start()
-        print("sentid" , sent.id)
-        bot.raid_id = sent.id
-        print(bot.raid_id, "WHY")
-        await sent.pin()
+        if bot.on_raid == False:
+            message = "```RAID IS BEGINNING: "+str(bot.raidlen) + " minutes left```"
+            sent = await ctx.send(message)
+            print(ctx.message.channel.id)
+            bot.account_id = ctx.message.channel.id
+            await ctx.message.delete()
+            looper.start()
+            print("sentid" , sent.id)
+            bot.raid_id = sent.id
+            print(bot.raid_id, "WHY")
+            await sent.pin()
+            bot.on_raid = True
+        else:
+            message = "YOU ARE ALREADY RAIDING, SEE PINNED MESSAGES"
+            await ctx.send(message)
 
 
 
@@ -305,6 +311,10 @@ async def raid_done():
     bot.minutes = 0
     channel = bot.get_channel(bot.account_id)
     await channel.send ("RAID DONE!")
+    sent = channel.fetch_message(bot.raid_id)
+    await sent.unpin()
+    bot.on_raid = False
+
 
 
 
