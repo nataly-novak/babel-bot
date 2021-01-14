@@ -425,7 +425,7 @@ async def schedule(ctx, zone = "UTC"):
     message = "!"
     today = getToday(zone)
     toddate = datetime.datetime.strptime(today,"%Y-%m-%d")
-    stamp_list = [toddate - datetime.timedelta(days=x) for x in range(7)]
+    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(7)]
     date_list = []
     for i in stamp_list:
         date_list.append(i.date())
