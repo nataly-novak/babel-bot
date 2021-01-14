@@ -413,7 +413,7 @@ async def event(ctx, day="", time="", channel="", name=""):
         message = ""
         for i in ev:
             channel = bot.get_channel(i[3])
-            line = str(i[0])+": "+str(i[1])+" "+str(i[2]).rsplit(sep=':',maxsplit=1)[0]+" "+ channel.mention + " "+i[4]+"\n"
+            line = str(i[0])+": "+str(i[1])+" "+str(i[2]).rsplit(sep=':',maxsplit=1)[0]+" "+ str(i[3]) + " "+i[4]+"\n"
             message += line
         await ctx.send(message)
 
@@ -441,7 +441,7 @@ async def schedule(ctx, zone = "UTC"):
         print(i)
         if i[1] in date_list:
             channel = bot.get_channel(i[3])
-            line = str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
+            line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
             message += line
     if message == "":
         message = "```No events next week, sorry```"
