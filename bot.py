@@ -129,8 +129,11 @@ async def delfunction(ctx, function):
 
 
 @bot.command(name='invite',help='prints koai invite',pass_context=True)
-async def invite(ctx):
-    message = "Want to invite a friend? Use this link: \n https://discord.gg/Fuvabsm"
+async def invite(ctx, invite = "koai"):
+    if invite == "koai":
+        message = "Want to invite a friend? Use this link: \n https://discord.gg/Fuvabsm"
+    elif invite == "koa":
+        message = "Do you want to join Knights of Academia, too? Use this link: \n https://discord.gg/EYX7XGG"
     await ctx.message.delete()
     await ctx.send(message)
 
