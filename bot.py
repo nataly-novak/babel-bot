@@ -420,7 +420,7 @@ async def event(ctx, day="", time="", channel="", name=""):
 
 @bot.command(name = "delevent", help = "Deletes an event",pass_context=True)
 @commands.has_any_role(ADMIN_ROLE, EVENT)
-async def delevent(ctx, conn, ticket):
+async def delevent(ctx, ticket):
     remevent(conn, int(ticket))
     await ctx.send("Ticket "+ticket+" was removed")
 
