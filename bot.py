@@ -285,6 +285,9 @@ async def on_member_update(before, after):
 
 @tasks.loop(minutes=1, count=100)
 async def looper():
+    if bot.minutes == bot.raidlen:
+        print('DONE')
+        looper.stop()
     print(bot.minutes)
     print(str(bot.raid_id), bot.account_id, "raid")
     channel = bot.get_channel(bot.account_id)
@@ -293,9 +296,7 @@ async def looper():
         remain = "```RAID HAS "+str(bot.raidlen-1-bot.minutes)+" MINUTES TO GO```"
         await raider.edit(content = remain)
     bot.minutes += 1
-    if bot.minutes > bot.raidlen:
-        print('DONE')
-        looper.stop()
+
 
 
 @looper.after_loop
