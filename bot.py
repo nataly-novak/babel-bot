@@ -495,7 +495,7 @@ async def updater():
             remevent(conn,i[0])
     print(message)
     if message != "":
-        message = bot.evrole[0].mention +""\n```CLOSEST EVENTS```\n"+message
+        message = bot.evrole[0].mention +"\n```CLOSEST EVENTS```\n"+message
         await announcements.send(message)
 
 
