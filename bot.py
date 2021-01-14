@@ -148,6 +148,7 @@ async def raid(ctx, times = '25'):
             bot.raid_id = sent.id
             await sent.pin()
             bot.on_raid = True
+            bot.raidbreak = True
         else:
             message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
             await ctx.send(message)
@@ -167,7 +168,8 @@ async def breaks(ctx, times = '5'):
             looper.start()
             bot.raid_id = sent.id
             await sent.pin()
-            bot.on_raid = False
+            bot.on_raid = True
+            bot.raidbreak = False
         else:
             message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
             await ctx.send(message)
