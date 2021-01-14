@@ -328,7 +328,7 @@ async def looper():
         if bot.raidbreak:
             remain = "```RAID HAS "+str(bot.raidlen-bot.minutes)+mins+" TO GO```"
         else:
-            remain = "```BOT HAS "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
+            remain = "```BREAK HAS "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
         await raider.edit(content = remain)
     bot.minutes += 1
 
