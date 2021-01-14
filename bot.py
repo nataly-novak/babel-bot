@@ -10,7 +10,7 @@ from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 from languages import checkrole, roletochan, addlanguage, languagedb, checkchan
 from randomer import coin, rannum
-from scheduler import maketimetable, addevent, geteventlist, convertlist
+from scheduler import maketimetable, addevent, geteventlist, convertlist, remevent
 
 import os
 import psycopg2
@@ -418,10 +418,17 @@ async def event(ctx, day="", time="", channel="", name=""):
         await ctx.send(message)
 
 
+@bot.command(name = "delevent", help = "Deletes an event",pass_context=True)
+@commands.has_any_role(ADMIN_ROLE, EVENT)
+async def delevent(ctx, conn, ticket):
+    remevent(conn, int(ticket))
+    await ctx.send("Ticket "+ticket+" was removed")
+
+
 
 @bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True)
 async def schedule(ctx, zone = "UTC"):
-    ev = convertlist(geteventlist(conn),zone)
+    ev = convertlist(conn, geteventlist(conn),zone)
     message = ""
     today = getToday(zone)
     toddate = datetime.datetime.strptime(today,"%Y-%m-%d")

@@ -52,13 +52,13 @@ def geteventlist(conn):
         a = []
         for j in i:
             a.append(j)
-        a[3] = getlanchan(conn, a[3].strip('\' '))
+        a[3] = a[3].strip("\' ")
         a[4] = a[4].strip('\' ')
         print(a)
         eventlist.append(a)
     return eventlist
 
-def convertlist(eventlist, zone):
+def convertlist(conn, eventlist, zone):
     timezone = pytz.timezone(zone.rstrip())
     utc_time = pytz.timezone("UTC")
     converted = []
@@ -71,9 +71,18 @@ def convertlist(eventlist, zone):
         local_datetime = utc_datetime.astimezone(timezone)
         i[1] = local_datetime.date()
         i[2] = local_datetime.time()
+        i[3] = getlanchan(conn, i[3])
         converted.append(i)
         print(i)
     return converted
+
+
+def remevent(conn, ticket):
+    cur = conn.cursor()
+    cur.execute("DELETE FROM timetable WHERE NMB = %s",(ticket))
+    conn.commit()
+
+
 
 
 
