@@ -70,7 +70,7 @@ def convertlist(eventlist, zone):
         local_datetime = utc_datetime.astimezone(timezone)
         i[1] = local_datetime.date()
         i[2] = local_datetime.time()
-        converted.append(local_datetime)
+        converted.append(i)
     return converted
 
 
