@@ -404,7 +404,7 @@ async def event(ctx, day="", time="", channel="", name=""):
     if day != "" and time != "" and channel != "" and name !="":
         addevent(conn,day, time, channel, name)
     elif day == "" and time == "" and channel == "" and name =="":
-        geteventlist()
+        geteventlist(conn)
 
 
 
