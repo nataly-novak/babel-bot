@@ -450,29 +450,32 @@ async def delevent(ctx, ticket):
 
 @bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True)
 async def schedule(ctx, zone = "UTC"):
-    ev = convertlist(conn, geteventlist(conn),zone)
-    message = ""
-    today = getToday(zone)
-    toddate = datetime.datetime.strptime(today,"%Y-%m-%d")
-    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(8)]
-    date_list = []
-    for i in stamp_list:
-        date_list.append(i.date())
-    print(date_list)
-    for i in ev:
-        print(i)
-        if i[1] in date_list:
-            if i[3] != -1:
-                channel = bot.get_channel(i[3])
-            else:
-                channel = discord.utils.get(ctx.guild.channels, name='common-room')
-            line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
-            message += line
-    if message == "":
-        message = "```No events next week, sorry```"
-    else:
-        message = "```THIS IS THIS WEEK'S SCHEDULE```\n"+message
-    await ctx.send(message)
+    chan = ctx.message.channel.id
+    if checksetting(conn, 'bot', chan):
+        ev = convertlist(conn, geteventlist(conn),zone)
+        message = ""
+        today = getToday(zone)
+        toddate = datetime.datetime.strptime(today,"%Y-%m-%d")
+        stamp_list = [toddate + datetime.timedelta(days=x) for x in range(8)]
+        date_list = []
+        for i in stamp_list:
+            date_list.append(i.date())
+        print(date_list)
+        for i in ev:
+            print(i)
+            if i[1] in date_list:
+                if i[3] != -1:
+                    channel = bot.get_channel(i[3])
+                else:
+                    channel = discord.utils.get(ctx.guild.channels, name='common-room')
+                line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
+                message += line
+        if message == "":
+            message = "```No events next week, sorry```"
+        else:
+            message = "```THIS IS THIS WEEK'S SCHEDULE```\n"+message
+        await ctx.send(message)
+    await ctx.message.delete()
 
 @tasks.loop(hours=24)
 async def updater():
