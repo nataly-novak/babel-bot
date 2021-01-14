@@ -144,13 +144,12 @@ async def raid(ctx, times = '25'):
             sent = await ctx.send(message)
             bot.account_id = ctx.message.channel.id
             await ctx.message.delete()
-            looper.start()
             bot.raid_id = sent.id
             await sent.pin()
             bot.on_raid = True
             bot.raidbreak = True
-            sent.add_reaction("🗡")
-            sent.add_reaction("⚔")
+            await sent.add_reaction("🗡")
+            await sent.add_reaction("⚔")
             bot.raidstatus = 1
 
         else:
@@ -260,6 +259,7 @@ async def on_raw_reaction_add(payload):
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.pin()
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "⚔" and payload.member.bot == False:
+            print("it's alive")
             looper.start()
             bot.raidstatus = 2
             channel = bot.get_channel(bot.account_id)
