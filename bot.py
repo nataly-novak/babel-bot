@@ -47,7 +47,7 @@ setdefaults(conn)
 filldb(conn)
 help_items = worddicts()
 languagedb(conn)
-maketimetable()
+maketimetable(conn)
 
 
 bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
