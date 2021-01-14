@@ -401,7 +401,7 @@ async def raid_done():
 
 
 @bot.command(name = "event", help = "Adds an event",pass_context=True)
-@commands.has_role(ADMIN_ROLE, EVENT)
+@commands.has_any_role(ADMIN_ROLE, EVENT)
 async def event(ctx, day="", time="", channel="", name=""):
     if day != "" and time != "" and channel != "" and name !="":
         num = addevent(conn,day, time, channel, name)
