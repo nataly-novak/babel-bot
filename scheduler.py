@@ -71,6 +71,7 @@ def convertlist(eventlist, zone):
         i[1] = local_datetime.date()
         i[2] = local_datetime.time()
         converted.append(i)
+        print(i)
     return converted
 
 
