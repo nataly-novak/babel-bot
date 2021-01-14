@@ -69,6 +69,7 @@ bot.raid_members = []
 bot.eventchan = 0
 bot.common = 0
 
+
 @bot.event
 async def on_ready():
     print ("Booting up your system")
@@ -447,7 +448,7 @@ async def schedule(ctx, zone = "UTC"):
     message = ""
     today = getToday(zone)
     toddate = datetime.datetime.strptime(today,"%Y-%m-%d")
-    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(7)]
+    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(8)]
     date_list = []
     for i in stamp_list:
         date_list.append(i.date())
@@ -474,7 +475,7 @@ async def updater():
     ev = convertlist(conn, geteventlist(conn), 'UTC')
     today = getToday('UTC')
     toddate = datetime.datetime.strptime(today, "%Y-%m-%d")
-    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(2)]
+    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(3)]
     date_list = []
     for i in stamp_list:
         date_list.append(i.date())
@@ -488,8 +489,9 @@ async def updater():
                 channel = bot.get_channel(bot.common)
             line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
             message += line
+    print(message)
     if message != "":
-        message = bot.eventrole.mention+"\n```CLOSEST EVENTS```\n"+message
+        message = "```CLOSEST EVENTS```\n"+message
         await announcements.send(message)
 
 
