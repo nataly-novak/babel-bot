@@ -68,6 +68,7 @@ bot.raidstatus = 0
 bot.raid_members = []
 bot.eventchan = 0
 bot.common = 0
+bot.eventrole = get(bot.guilds.roles, name = "Events")
 
 
 @bot.event
@@ -493,7 +494,7 @@ async def updater():
             remevent(conn,i)
     print(message)
     if message != "":
-        message = "```CLOSEST EVENTS```\n"+message
+        message = bot.eventrole.mention+"\n```CLOSEST EVENTS```\n"+message
         await announcements.send(message)
 
 
