@@ -422,14 +422,16 @@ async def event(ctx, day="", time="", channel="", name=""):
 @bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True)
 async def schedule(ctx, zone = "UTC"):
     ev = convertlist(geteventlist(conn),zone)
-    message = ""
+    message = "!"
     today = getToday(zone)
     toddate = datetime.datetime.strptime(today,"%Y-%m-%d")
     stamp_list = [toddate - datetime.timedelta(days=x) for x in range(7)]
     date_list = []
     for i in stamp_list:
         date_list.append(i.date())
+    print(date_list)
     for i in ev:
+        print(i)
         if i[1] in date_list:
             channel = bot.get_channel(i[3])
             line = str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
