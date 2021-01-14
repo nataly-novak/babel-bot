@@ -7,7 +7,7 @@ def maketimetable(conn):
     check = (cur.fetchone()[0])
     print(check)
     if not check:
-        cur.execute('''CREATE TABLE languages (
+        cur.execute('''CREATE TABLE timetable (
                     NMB INT NOT NULL,
                     DAY DATE NOT NULL,
                     CLOCK TIME NOT NULL,
@@ -16,12 +16,12 @@ def maketimetable(conn):
                     
                     );''')
         print("Table created successfully")
-        cur.execute('ALTER TABLE languages ADD CONSTRAINT date_key PRIMARY KEY (DAY, CLOCK, CHAN);')
+        cur.execute('ALTER TABLE timetable ADD CONSTRAINT date_key PRIMARY KEY (DAY, CLOCK, CHAN);')
     else:
         print('No need')
     conn.commit()
 
-def addevent(conn, day, clock, chan, name)
+def addevent(conn, day, clock, chan, name):
         cur = conn.cursor()
         cur.execute("SELECT MAX(NMB) FROM timetable;")
         a = str(cur.fetchone())
@@ -32,7 +32,7 @@ def addevent(conn, day, clock, chan, name)
         line = "INSERT INTO timetable VALUES ("+str(ar)+","+day+","+clock+",\""+chan+"\","+"\""+name+"\")"
         print(line)
         conn.commit()
-        cur.execute("SELECT NMB,DAY, CLOCK, CHAN, NAME from languages")
+        cur.execute("SELECT NMB,DAY, CLOCK, CHAN, NAME from timetable")
         rows = cur.fetchall()
         x = 0
         for j in rows:
