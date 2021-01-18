@@ -103,7 +103,8 @@ async def on_ready():
                 print("!!!!!")
                 print(role.name)
                 bot.evrole.append(role)
-        print(bot.evrole[0].id)
+        if bot.evrole:
+            print(bot.evrole[0].id)
 
     updater.start()
 
@@ -523,7 +524,10 @@ async def updater():
             remevent(conn,i[0])
     print(message)
     if message != "":
-        message = bot.evrole[0].mention +"\n```CLOSEST EVENTS```\n"+message
+        if bot.evrole :
+            message = bot.evrole[0].mention +"\n```CLOSEST EVENTS```\n"+message
+        else:
+            message =  "```CLOSEST EVENTS```\n" + message
         await announcements.send(message)
 
 
