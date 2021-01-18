@@ -29,6 +29,10 @@ if STAGE == 'dev':
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
+elif STAGE == 'local':
+    DATABASE_URL = os.environ['DATABASE_URL']
+    conn = psycopg2.connect(DATABASE_URL)
+
 else:
     PSQL_HOST = os.getenv('PSQL_HOST')
     PSQL_USER = os.getenv('PSQL_USER')
@@ -84,10 +88,11 @@ async def on_ready():
                 addlanguage(conn,channel.name, channel.id)
             elif channel.name == "event-announcements":
                 print(channel.id)
+                print(channel.name)
                 bot.eventchan = channel.id
             elif channel.name == "common-room":
                 print(channel.id)
-                bot.commonchan = channel.id
+                bot.common = channel.id
         for role in guild.roles:
             line = str(role.name)
             print(line)
@@ -479,6 +484,7 @@ async def schedule(ctx, zone = "UTC"):
 
 @tasks.loop(hours=24)
 async def updater():
+    print(bot.get_channel(bot.common).name)
     announcements = bot.get_channel(bot.eventchan)
     message = ""
     ev = convertlist(conn, geteventlist(conn), 'UTC')
