@@ -73,6 +73,7 @@ bot.raid_members = []
 bot.eventchan = 0
 bot.common = 0
 bot.evrole = []
+bot.keepers = 0
 
 
 @bot.event
@@ -93,6 +94,8 @@ async def on_ready():
             elif channel.name == "common-room":
                 print(channel.id)
                 bot.common = channel.id
+            elif channel.name == "keepers-table":
+                bot.keepers = channel.id
         for role in guild.roles:
             line = str(role.name)
             print(line)
@@ -288,6 +291,17 @@ async def ran(ctx, number, amount = 1):
     if checksetting(conn, 'bot', chan):
         await ctx.send(rannum(int(number),int(amount)))
 
+@bot.command(name = 'inquire', help="Works from dm only, allows you to message keepers, put the message into quotes",pass_context=True)
+async def inquire(ctx, message):
+    if not ctx.guild:
+        sender = ctx.author.mention
+        keep = bot.get_channel(bot.keepers)
+        await keep.send(sender+" "+message)
+        await ctx.send("Thank you! The Keepers will read your message as soon as possible and contact you if necessary")
+    else:
+        await ctx.send("This is a DM-only command")
+
+
 
 
 @bot.event
@@ -318,6 +332,8 @@ async def on_raw_reaction_add(payload):
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛏️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
+
+
 
 
 
@@ -358,7 +374,6 @@ async def on_message(message):
             response =str(hug)
             bot.hug_counter = 0
             await message.channel.send(response)
-
 
     await bot.process_commands(message)
 

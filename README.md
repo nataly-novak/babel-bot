@@ -32,8 +32,21 @@ If you wrote it wrong - /del removes last quote. Please stay civil and don't del
 
 /rand number_of_participants number_of winners - choses random winners
 
+/schedule Continent/City shows the list of events planned next week converted into your timezone. Default is UTC 
+
+/inquire "The message to keepers in quotes" - works in DMs only, sends your message to administration channel, so 
+all the keepers can see it. They will be able to see who sent it and contact you back. Can be used for feedback
+or problem report
+
 the bot also welcomes you when you join a new channel
 
 Keepers can adjust channel roles with /addfunction and prefix with /setpref
+
+Event Managers have access to /event command. Without arguments it shows all planned events. 
+The event is added like /event date time channel "description however long it is".
+You will also recieve the ticket number, which can be used if you want to delete event
+
+/delevent number removes your event
+
 
 
