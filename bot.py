@@ -498,37 +498,41 @@ async def schedule(ctx, zone = "UTC"):
         await ctx.send(message)
     await ctx.message.delete()
 
-@tasks.loop(hours=24)
+@tasks.loop(hours=1)
 async def updater():
-    print(bot.get_channel(bot.common).name)
-    announcements = bot.get_channel(bot.eventchan)
-    message = ""
-    ev = convertlist(conn, geteventlist(conn), 'UTC')
-    today = getToday('UTC')
-    toddate = datetime.datetime.strptime(today, "%Y-%m-%d")
-    stamp_list = [toddate + datetime.timedelta(days=x) for x in range(3)]
-    date_list = []
-    for i in stamp_list:
-        date_list.append(i.date())
-    print(date_list)
-    for i in ev:
-        print(i)
-        if i[1] in date_list:
-            if i[3] != -1:
-                channel = bot.get_channel(i[3])
+    hour = datetime.datetime.utcnow().time().hour
+    if hour == 12:
+        print(bot.get_channel(bot.common).name)
+        announcements = bot.get_channel(bot.eventchan)
+        message = ""
+        ev = convertlist(conn, geteventlist(conn), 'UTC')
+        today = getToday('UTC')
+        toddate = datetime.datetime.strptime(today, "%Y-%m-%d")
+        stamp_list = [toddate + datetime.timedelta(days=x) for x in range(3)]
+        date_list = []
+        for i in stamp_list:
+            date_list.append(i.date())
+        print(date_list)
+        for i in ev:
+            print(i)
+            if i[1] in date_list:
+                if i[3] != -1:
+                    channel = bot.get_channel(i[3])
+                else:
+                    channel = bot.get_channel(bot.common)
+                line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
+                message += line
+            elif i[1]<toddate.date():
+                remevent(conn,i[0])
+        print(message)
+        if message != "":
+            if bot.evrole :
+                message = bot.evrole[0].mention +"\n```CLOSEST EVENTS```\n"+message
             else:
-                channel = bot.get_channel(bot.common)
-            line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
-            message += line
-        elif i[1]<toddate.date():
-            remevent(conn,i[0])
-    print(message)
-    if message != "":
-        if bot.evrole :
-            message = bot.evrole[0].mention +"\n```CLOSEST EVENTS```\n"+message
-        else:
-            message =  "```CLOSEST EVENTS```\n" + message
-        await announcements.send(message)
+                message =  "```CLOSEST EVENTS```\n" + message
+            await announcements.send(message)
+    else:
+        print("Hour is ", hour)
 
 
 
