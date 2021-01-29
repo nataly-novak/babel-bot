@@ -341,10 +341,25 @@ async def on_raw_reaction_add(payload):
 @bot.event
 async def on_raw_reaction_remove(payload):
     chan = payload.channel_id
-    if checksetting(conn,'accountability', chan) and payload.emoji.name == "📌":
-        print("emoji_removed")
-        msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-        await msg.unpin()
+    if checksetting(conn,'accountability', chan):
+        if payload.emoji.name == "📌":
+            print("emoji_removed")
+            msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+            await msg.unpin()
+        elif payload.message_id == bot.raid_id and (bot.raidstatus == 2 or bot.raidstatus == 1)  and payload.emoji.name == "🗡" :
+            raidmsg = await bot.get_channel(chan).fetch_message(bot.raid_id)
+            reacs = raidmsg.reactions
+            raiders = []
+            for i in reacs:
+                if i.emoji == "🗡":
+                    async for user in i.users():
+                        raiders.append(user.id)
+            print(raiders)
+            for i in bot.raid_members:
+                if i not in raiders:
+                    bot.raid_members.remove(i)
+
+
 
 
 @bot.event
@@ -411,6 +426,8 @@ async def looper():
             remain = "```BREAK HAS "+str(bot.raidlen-bot.minutes)+" MINUTES TO GO```"
         await raider.edit(content = remain)
     bot.minutes += 1
+
+
 
 
 
