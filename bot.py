@@ -359,6 +359,10 @@ async def on_raw_reaction_remove(payload):
                 if i not in raiders:
                     bot.raid_members.remove(i)
 
+            if bot.raid_members == []:
+                print(bot.raid_members)
+                looper.cancel()
+
 
 
 
@@ -437,12 +441,15 @@ async def raid_done():
     bot.minutes = 0
     channel = bot.get_channel(bot.account_id)
     if bot.raidbreak:
-        message = "RAID DONE!!!\n Congratulations to "
-        for user in bot.raid_members:
-            member = await bot.fetch_user(user)
-            name = member.mention
-            message = message + name +", "
-        message = message[:-2]+"!"
+        if bot.raid_members != []:
+            message = "RAID DONE!!!\n Congratulations to "
+            for user in bot.raid_members:
+                member = await bot.fetch_user(user)
+                name = member.mention
+                message = message + name +", "
+            message = message[:-2]+"!"
+        else:
+            message = "Sorry, everyone left"
         await channel.send (message)
         bot.raid_members = []
 
