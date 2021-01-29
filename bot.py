@@ -508,7 +508,7 @@ async def schedule(ctx, zone = "UTC"):
         print(date_list)
         for i in ev:
             print(i)
-            if i[1] in date_list:
+            if i[1] in date_list and  i[2].hour > datetime.datetime.utcnow().time().hour or (i[2].hour == datetime.datetime.utcnow().time().hour and i[2].minute >= datetime.datetime.utcnow().time().minute):
                 if i[3] != -1:
                     channel = bot.get_channel(i[3])
                 else:
@@ -539,12 +539,12 @@ async def updater():
         print(date_list)
         for i in ev:
             print(i)
-            if i[1] in date_list:
+            if i[1] in date_list and i[2].hour > 12 or (i[2].hour ==12 and i[2].minute >= datetime.datetime.utcnow().time().minute):
                 if i[3] != -1:
                     channel = bot.get_channel(i[3])
                 else:
                     channel = bot.get_channel(bot.common)
-                line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " " + channel.mention + " " + i[4] + "\n"
+                line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " UTC " + channel.mention + " " + i[4] + "\n"
                 message += line
             elif i[1]<toddate.date():
                 remevent(conn,i[0])
