@@ -360,6 +360,7 @@ async def on_raw_reaction_add(payload):
             print(raidlist)
             bot.current_raid.amnt = len(bot.raid_members)
             bot.current_raid.mmbr = raidlist
+            await channel.send("```RAID HAS STARTED!```")
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
