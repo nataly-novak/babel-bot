@@ -320,6 +320,7 @@ async def on_raw_reaction_add(payload):
             channel = bot.get_channel(bot.account_id)
             raider = await channel.fetch_message(bot.raid_id)
             remain = "```RAID IS BEGINNING: "+str(bot.raidlen-bot.minutes+1)+" MINUTES TO GO```"
+            await channel.send("```RAID HAS STARTED!```")
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
