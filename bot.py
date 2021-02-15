@@ -12,6 +12,10 @@ from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 from languages import checkrole, roletochan, addlanguage, languagedb, checkchan
 from randomer import coin, rannum
 from scheduler import maketimetable, addevent, geteventlist, convertlist, remevent
+from pombase import makepombases, checkgame, setgame, setuserval,getuserval, setraidstat, getraidstat
+from pommer import Pommer
+from stamper import line_update
+from raid import  Raid
 
 import os
 import psycopg2
@@ -46,7 +50,7 @@ else:
     )
 
 
-
+cur = conn.cursor()
 
 
 settingsdb(conn)
@@ -56,6 +60,10 @@ filldb(conn)
 help_items = worddicts()
 languagedb(conn)
 maketimetable(conn)
+makepombases(conn)
+
+print("Checkgame = ",checkgame(conn))
+
 
 
 bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
@@ -74,7 +82,9 @@ bot.eventchan = 0
 bot.common = 0
 bot.evrole = []
 bot.keepers = 0
-
+bot.isgame = checkgame(conn)
+bot.congrats = 0
+bot.current_raid = Raid("",0,"")
 
 @bot.event
 async def on_ready():
@@ -179,6 +189,10 @@ async def invite(ctx, invite = "koai"):
 async def raid(ctx, times = '25'):
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
+        if len(bot.raid_members) !=0:
+            bot.raid_members = []
+            print(bot.current_raid.stamp, bot.current_raid.mmbr)
+            setraidstat(conn, bot.current_raid)
         if bot.on_raid == False:
             bot.raidlen = int(times)
             message = "```WAITING FOR RAID OF " +times+  " MINUTES TO START.....```"
@@ -192,6 +206,9 @@ async def raid(ctx, times = '25'):
             await sent.add_reaction("🗡")
             await sent.add_reaction("⚔")
             bot.raidstatus = 1
+            if getraidstat(conn):
+                bot.current_raid = getraidstat(conn)
+
 
         else:
             message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
@@ -262,13 +279,30 @@ async def raid(ctx, theme = ""):
 @commands.has_role(ADMIN_ROLE)
 async def setpref(ctx, prefix):
     setprefix(conn,prefix)
-    getprefix(conn)
     x = getprefix(conn)
     bot.command_prefix = x
     await ctx.message.delete()
     message = "Prefix is set to "+x
     await ctx.send(message)
 
+
+@bot.command(name='dragon', help='sets a new prefix for bot',pass_context=True)
+@commands.has_role(ADMIN_ROLE)
+async def dragon(ctx, handle):
+    if handle == "start":
+        game = "True"
+        message = "Let the game begin! "
+        bot.isgame = True
+    elif handle == "stop":
+        game = "False"
+        bot.isgame = False
+        message = "The game was stopped"
+    setgame(conn,game)
+
+
+    await ctx.message.delete()
+
+    await ctx.send(message)
 
 @bot.command(name='addlang', help='sets language channel',pass_context=True)
 @commands.has_role(ADMIN_ROLE)
@@ -320,6 +354,12 @@ async def on_raw_reaction_add(payload):
             channel = bot.get_channel(bot.account_id)
             raider = await channel.fetch_message(bot.raid_id)
             remain = "```RAID IS BEGINNING: "+str(bot.raidlen-bot.minutes+1)+" MINUTES TO GO```"
+            raidlist = ""
+            for i in bot.raid_members:
+                raidlist = raidlist+str(i)+"; "
+            print(raidlist)
+            bot.current_raid.amnt = len(bot.raid_members)
+            bot.current_raid.mmbr = raidlist
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
@@ -333,6 +373,34 @@ async def on_raw_reaction_add(payload):
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛏️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
+        elif payload.message_id == bot.congrats and bot.raidstatus == 4 and payload.emoji.name in ["🗡", "🛡️", "💊", "⛏", "💣","❓"] and payload.member.bot == False:
+            player = payload.member.id
+            bot.raid_members.remove(player)
+            raider = getuserval(conn, player)
+            if raider != None:
+                print(raider.poms+"t")
+                print("________________")
+                print(raider.total)
+                raider.total+=1
+                raider.poms = line_update(raider.poms)
+                setuserval(conn,raider)
+                raider = getuserval(conn, player)
+                print(raider.total, raider.poms)
+            else:
+                newRaider = Pommer(player)
+                newRaider.poms = line_update(newRaider.poms)
+                setuserval(conn, newRaider)
+                newRaider = getuserval(conn, player)
+                print(newRaider.total, newRaider.poms)
+            if len(bot.raid_members) ==0:
+                print(bot.current_raid.stamp, bot.current_raid.mmbr)
+                setraidstat(conn, bot.current_raid)
+                bot.raidstatus = 0
+
+
+
+
+
 
 
 
@@ -448,10 +516,30 @@ async def raid_done():
                 name = member.mention
                 message = message + name +", "
             message = message[:-2]+"!"
+            sent = await channel.send(message)
+            if bot.isgame:
+                await sent.add_reaction("🗡")
+                await sent.add_reaction("🛡️")
+                await sent.add_reaction("💊")
+                if len(bot.raid_members)>3:
+                    await sent.add_reaction("⛏")
+                if len(bot.raid_members)>5:
+                    await sent.add_reaction("💣")
+                if len(bot.raid_members)>7:
+                    await sent.add_reaction("❓")
+                bot.congrats = sent.id
+                bot.raidstatus = 4
+            else:
+                bot.raidstatus = 0
+            bot.current_raid.stamp = currentUTC()
+
+
+
         else:
             message = "Sorry, everyone left"
-        await channel.send (message)
-        bot.raid_members = []
+            await channel.send(message)
+
+
 
     else:
         message = "BREAK FINISHED!!!\n Let's go back to work, "
@@ -461,12 +549,12 @@ async def raid_done():
             message = message + name + ", "
         message = message[:-2] + "!"
         await channel.send(message)
-        bot.raid_members = []
     sent = await channel.fetch_message(bot.raid_id)
     print(sent.content)
     await sent.unpin()
     bot.on_raid = False
-    bot.raidstatus = 0
+
+
 
 
 
