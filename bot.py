@@ -12,15 +12,17 @@ from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 from languages import checkrole, roletochan, addlanguage, languagedb, checkchan
 from randomer import coin, rannum
 from scheduler import maketimetable, addevent, geteventlist, convertlist, remevent
-from pombase import makepombases, checkgame, setgame, setuserval,getuserval, setraidstat, getraidstat
+from pombase import makepombases, checkgame, setgame, setuserval,getuserval, setraidstat, getraidstat, getaction
 from pommer import Pommer
 from stamper import line_update
+from mechanics import ranpop
 from raid import  Raid
 
 import os
 import psycopg2
 import pytz
 import datetime
+
 
 intents = discord.Intents.all()
 
@@ -48,10 +50,9 @@ else:
         dbname=PSQL_DATABASE,
         password=PSQL_PASSWORD
     )
-
-
 cur = conn.cursor()
 
+cur.execute("DROP TABLE pommers, pombase")
 
 settingsdb(conn)
 makedb(conn)
@@ -62,7 +63,7 @@ languagedb(conn)
 maketimetable(conn)
 makepombases(conn)
 
-print("Checkgame = ",checkgame(conn))
+
 
 
 
@@ -85,6 +86,8 @@ bot.keepers = 0
 bot.isgame = checkgame(conn)
 bot.congrats = 0
 bot.current_raid = Raid("",0,"")
+bot.current_raiders = {}
+bot.raider_actions = {}
 
 @bot.event
 async def on_ready():
@@ -192,7 +195,14 @@ async def raid(ctx, times = '25'):
         if len(bot.raid_members) !=0:
             bot.raid_members = []
             print(bot.current_raid.stamp, bot.current_raid.mmbr)
+            for i in bot.current_raiders:
+                user = i.user
+                print(bot.raider_actions[user])
+                setuserval(conn, i)
             setraidstat(conn, bot.current_raid)
+            bot.raidstatus = 0
+            bot.raider_actions = {}
+            bot.current_raiders = {}
         if bot.on_raid == False:
             bot.raidlen = int(times)
             message = "```WAITING FOR RAID OF " +times+  " MINUTES TO START.....```"
@@ -364,6 +374,12 @@ async def on_raw_reaction_add(payload):
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
+            if getuserval(conn,payload.member.id):
+                bot.current_raiders[str(payload.member.id)]=(getuserval(conn, payload.member.id))
+                print("exist")
+            else:
+                bot.current_raiders[str(payload.member.id)]=(Pommer(str(payload.member.id), 50))
+                print("new")
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "💤" and payload.member.bot == False:
             print("it's alive")
             looper.start()
@@ -377,26 +393,56 @@ async def on_raw_reaction_add(payload):
         elif payload.message_id == bot.congrats and bot.raidstatus == 4 and payload.emoji.name in ["🗡", "🛡️", "💊", "⛏", "💣","❓"] and payload.member.bot == False:
             player = payload.member.id
             bot.raid_members.remove(player)
-            raider = getuserval(conn, player)
-            if raider != None:
-                print(raider.poms+"t")
-                print("________________")
-                print(raider.total)
-                raider.total+=1
-                raider.poms = line_update(raider.poms)
-                setuserval(conn,raider)
-                raider = getuserval(conn, player)
-                print(raider.total, raider.poms)
-            else:
-                newRaider = Pommer(player)
-                newRaider.poms = line_update(newRaider.poms)
-                setuserval(conn, newRaider)
-                newRaider = getuserval(conn, player)
-                print(newRaider.total, newRaider.poms)
+            raider = bot.current_raiders[str(player)]
+
+            print(raider.poms+"t")
+            print("________________")
+            print(raider.total)
+            raider.total+=1
+            raider.poms = line_update(raider.poms)
+            print(raider.total, raider.poms)
+            bot.raider_actions[raider.user] = payload.emoji.name
+            bot.current_raiders[str(payload.member.id)] = raider
+
+
             if len(bot.raid_members) ==0:
+                damage = 0
                 print(bot.current_raid.stamp, bot.current_raid.mmbr)
+                print("__________________")
+                selector = []
+                for i in bot.current_raiders:
+                    bot.current_raiders[i].ac = 15
+                    selector.append(bot.current_raiders[i].user)
+                for i in bot.current_raiders:
+                    user = bot.current_raiders[i].user
+
+                    command = getaction(bot.raider_actions[i])
+                    if command in ["sword", "axe", "fire"]:
+                        result = bot.current_raiders[i].action(command, bot.current_raid.ac)
+                        print(result," RESULT")
+                        damage += result[0]
+                    elif command == "defence":
+                        ln = len(bot.current_raiders)
+                        nm = min(3, max(ln//3, 1))
+                        lst = ranpop(nm, ln)
+                        print("LST: ", lst)
+                        for j in lst:
+                            print("I: ",j)
+                            bot.current_raiders[selector[j]].action("defence",1)
+                    elif command == "heal":
+                        for j in bot.current_raiders:
+                            bot.current_raiders[j].action("heal", 0)
+                    print(str(bot.current_raiders[i]))
+                    setuserval(conn, bot.current_raiders[i])
+
+
+                print("__________________")
+                bot.current_raid.bhp-=damage
+                print("hp: ", bot.current_raid.bhp)
                 setraidstat(conn, bot.current_raid)
                 bot.raidstatus = 0
+                bot.raider_actions = {}
+                bot.current_raiders = {}
 
 
 

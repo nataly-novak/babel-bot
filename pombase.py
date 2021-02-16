@@ -1,5 +1,6 @@
 from pommer import Pommer
 from raid import Raid
+emojis = {"🗡":"sword", "🛡️":"defence", "💊":"heal", "⛏":"axe", "💣":"fire","❓":"debuff"}
 
 def makepombases(conn):
     cur = conn.cursor()
@@ -38,7 +39,7 @@ def makepombases(conn):
                     POMMER CHAR(50) NOT NULL,
                     HP INT NOT NULL,              
                     AC INT NOT NULL,
-                    SAVE INT NOT NULL,
+                    DAMAGE INT NOT NULL,
                     ATTACK INT NOT NULL,
                     TOTAL INT NOT NULL,
                     POMS CHAR(400)
@@ -84,7 +85,7 @@ def checkgame(conn):
 
 def getuserval(conn, user):
     cur = conn.cursor()
-    cur.execute("SELECT POMMER, HP, AC, SAVE, ATTACK, TOTAL, POMS FROM pommers WHERE POMMER = %s", (str(user).ljust(50),))
+    cur.execute("SELECT POMMER, HP, AC, DAMAGE, ATTACK, TOTAL, POMS FROM pommers WHERE POMMER = %s", (str(user).ljust(50),))
     resp = (cur.fetchone())
     if resp == None:
         return None
@@ -116,9 +117,9 @@ def setuserval(conn, pommer: Pommer):
         isNew = True
     print(isNew)
     if isNew:
-        cur.execute("INSERT INTO pommers VALUES (%s,%s,%s,%s, %s,%s,%s,%s)", (str(rr), str(pommer.user), str(pommer.hp), str(pommer.ac), str(pommer.save), str(pommer.attack), str(pommer.total), str(pommer.poms)))
+        cur.execute("INSERT INTO pommers VALUES (%s,%s,%s,%s, %s,%s,%s,%s)", (str(rr), str(pommer.user), str(pommer.hp), str(pommer.ac), str(pommer.damage), str(pommer.attack), str(pommer.total), str(pommer.poms)))
     else:
-        cur.execute("UPDATE pommers SET HP= %s, AC=%s,  SAVE=%s, ATTACK=%s, TOTAL=%s, POMS=%s WHERE POMMER = %s", (str(pommer.hp), str(pommer.ac), str(pommer.save), str(pommer.attack), str(pommer.total), str(pommer.poms), str(pommer.user)))
+        cur.execute("UPDATE pommers SET HP= %s, AC=%s,  DAMAGE=%s, ATTACK=%s, TOTAL=%s, POMS=%s WHERE POMMER = %s", (str(pommer.hp), str(pommer.ac), str(pommer.damage), str(pommer.attack), str(pommer.total), str(pommer.poms), str(pommer.user)))
     conn.commit()
 
 
@@ -151,3 +152,6 @@ def setraidstat(conn, raid: Raid):
         ar = int(a[1:-2]) + 1
     cur.execute("INSERT INTO pombase VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(str(ar), str(raid.stamp),str(raid.amnt),str(raid.mmbr),str(raid.acts), str(raid.trg), str(raid.attacks), str(raid.bhp), str(raid.vhp),str(raid.bab), str(raid.ac), str(raid.save) ) )
     conn.commit()
+
+def getaction(emoji):
+    return emojis[emoji]
