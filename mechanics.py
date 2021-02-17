@@ -1,4 +1,5 @@
 import random
+from vars import *
 
 def roll(die, amnt = 1):
     res = 0
@@ -56,7 +57,7 @@ def bomb(BAB, AC, amnt = 3, damage = 4):
         return [0, "Miss"]
 
 def channeling():
-    return roll(6)+roll(6)
+    return roll(6, channel_dies)
 
 
 def ranpop(number, length):

@@ -30,17 +30,16 @@ class Pommer:
     def fire(self, defence):
         return bomb(self.attack, defence)
 
-    def heal (self):
-        healed = channeling()
+    def heal (self, healed):
         self.hp = min(self.hp+healed, 100)
-        self.staggered = False
+        self.staggered = 2
         return [healed,"Healed!"]
 
     def suffer(self, amount):
         res= max(self.hp - amount, 0)
         self.hp = res
         if res ==0:
-            self.staggered = True
+            self.staggered = 0
             return [amount, "Staggered!"]
         else:
             return [amount, "Damaged!"]
@@ -59,6 +58,6 @@ class Pommer:
         elif name == "defence":
             return self.shield(target)
         elif name == "heal":
-            return self.heal()
+            return self.heal(target)
 
 

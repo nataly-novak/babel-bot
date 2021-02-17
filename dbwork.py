@@ -75,7 +75,7 @@ def settingsdb(conn):
                     VAL CHAR(20) NOT NULL
                     );''')
         print("Table created successfully")
-        cur.execute('ALTER TABLE game ADD CONSTRAINT test_pkey6 PRIMARY KEY (VAL);')
+        cur.execute('ALTER TABLE game ADD CONSTRAINT test_pkey7 PRIMARY KEY (VAL);')
     else:
         print('No need')
     conn.commit()

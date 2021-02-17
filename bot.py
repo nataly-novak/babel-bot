@@ -5,7 +5,7 @@ from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
-    setprefix, setdefaults, getprefix, quotenum
+    setprefix, setdefaults, getprefix, quotenum, getchannel
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
@@ -15,8 +15,9 @@ from scheduler import maketimetable, addevent, geteventlist, convertlist, remeve
 from pombase import makepombases, checkgame, setgame, setuserval,getuserval, setraidstat, getraidstat, getaction
 from pommer import Pommer
 from stamper import line_update
-from mechanics import ranpop, roll
+from mechanics import ranpop, roll, channeling
 from raid import  Raid
+from vars import *
 
 import os
 import psycopg2
@@ -52,7 +53,7 @@ else:
     )
 cur = conn.cursor()
 
-cur.execute("DROP TABLE pommers, pombase")
+cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
 
 settingsdb(conn)
 makedb(conn)
@@ -89,6 +90,7 @@ bot.current_raid = getraidstat(conn)
 bot.current_raiders = {}
 bot.raider_actions = {}
 bot.damagers = []
+bot.guild = None
 
 @bot.event
 async def on_ready():
@@ -119,7 +121,7 @@ async def on_ready():
                 bot.evrole.append(role)
         if bot.evrole:
             print(bot.evrole[0].id)
-
+    bot.guild = bot.guilds[0]
     updater.start()
 
 
@@ -408,6 +410,7 @@ async def on_raw_reaction_add(payload):
 
 
             if len(bot.raid_members) ==0:
+                message = ""
                 damage = 0
                 bot.current_raid.vhp = min(bot.current_raid.vhp, 500)
                 print(bot.current_raid.stamp, bot.current_raid.mmbr)
@@ -419,6 +422,11 @@ async def on_raw_reaction_add(payload):
                     if bot.current_raiders[i].hp == 0:
                         bot.current_raiders[i].staggered = 0
                 for i in bot.current_raiders:
+                    user = bot.guild.get_member(int(bot.current_raiders[i].user))
+                    if user.nick:
+                        name = user.nick
+                    else:
+                        name = user.name
                     if bot.current_raiders[i].staggered == 2:
                         command = getaction(bot.raider_actions[i])
                         if command in ["sword", "axe", "fire"]:
@@ -427,22 +435,35 @@ async def on_raw_reaction_add(payload):
                             print(result," RESULT")
                             damage += result[0]
                             bot.damagers.append([result[0], bot.current_raiders[i].user])
+                            message = message + name+ " uses "+ command +". It's a "+ result[1] + " with "+ str(result[0]) + " damage\n"
                         elif command == "defence":
                             ln = len(bot.current_raiders)
-                            nm = min(3, max(ln//3, 1))
+                            nm = min(max_shields, max(ln//3, 1))
                             lst = ranpop(nm, ln)
                             print("LST: ", lst)
+                            defs = ""
                             for j in lst:
                                 print("I: ",j)
                                 bot.current_raiders[selector[j]].action("defence",1)
+                                defended = bot.guild.get_member(int(selector[j]))
+                                if defended.nick:
+                                    def_name = user.nick
+                                else:
+                                    def_name = user.name
+                                defs = defs + def_name+", "
                             bot.damagers.append([0, bot.current_raiders[i].user])
+                            message = message+ name +" uses" + command + " to defend "+ defs +" it increases their defence by 1\n"
+
                         elif command == "heal":
                             for j in bot.current_raiders:
-                                bot.current_raiders[j].action("heal", 0)
+                                res = bot.current_raiders[j].action("heal", channeling())
+                            message = message + name +" uses "+ command + " to heal "+ str(res[0]) +" hp to everyone!\n"
                             bot.damagers.append([0, bot.current_raiders[i].user])
+
                         print(str(bot.current_raiders[i]))
                     else:
                         bot.damagers.append([0, bot.current_raiders[i].user])
+                        message = message+ name + " is staggered and can't do anything\n"
                 useless = 0
                 destruction = False
                 for i in bot.current_raiders:
@@ -459,23 +480,37 @@ async def on_raw_reaction_add(payload):
                         atk = ranpop(amnt,n)
                         for i in atk:
                             damaged = bot.current_raiders[bot.damagers[i][1]]
+                            defended = bot.guild.get_member(int(damaged.user))
+                            if defended.nick:
+                                def_name = user.nick
+                            else:
+                                def_name = user.name
                             dam = bot.current_raid.physical(damaged.ac)
                             res=bot.current_raiders[bot.damagers[i][1]].suffer(dam[0])
                             print("RESULT ", res)
                             print(str(bot.current_raiders[bot.damagers[i][1]]))
+                            message = message+"Dragon attacks "+def_name+"! It's a "+ dam[1]+ " with "+ str(dam[0]) +" damage!\n"
                         bot.current_raid.trg -=1
                     else:
+                        message = message + "Dragon uses it's breath!\n"
                         for i in selector:
                             staggered = roll(2)
                             if staggered == 2:
                                 bot.current_raiders[i].staggered = 0
                                 print("Staggered", i)
-                            bot.current_raid.trg = roll(4)+6
+                                defended = bot.guild.get_member(int(bot.current_raiders[i].user))
+                                if defended.nick:
+                                    def_name = user.nick
+                                else:
+                                    def_name = user.name
+                                message = message+def_name+ "is staggered for the next round"
+                            bot.current_raid.trg = roll(breath_roll)+breath_cooldown
                 else:
                     res = bot.current_raid.burn()
                     print("Burned", res)
+                    message += message+ "The dragon uses it's breath on the village and deals " +str(res[0]) + "damage. "+str(bot.current_raid.vhp) +" hp remains\n"
                 for i in bot.current_raiders:
-                    bot.current_raiders[i].staggered += 1
+                    bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered+1)
                     setuserval(conn, bot.current_raiders[i])
 
 
@@ -488,6 +523,8 @@ async def on_raw_reaction_add(payload):
                 bot.raider_actions = {}
                 bot.current_raiders = {}
                 bot.damagers = []
+                protocol = bot.get_channel(getchannel(conn,"game"))
+                await protocol.send(message)
 
 
 
