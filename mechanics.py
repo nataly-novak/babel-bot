@@ -1,7 +1,10 @@
 import random
 
-def roll(die):
-    return random.randrange(1, die+1)
+def roll(die, amnt = 1):
+    res = 0
+    for i in range(amnt):
+        res += random.randrange(1, die+1)
+    return res
 
 def attack(BAB, weapon_die, weapon_damage, multiplier, AC):
     crit = False
@@ -29,7 +32,7 @@ def attack(BAB, weapon_die, weapon_damage, multiplier, AC):
     else:
         return [0, "Miss"]
 
-def bomb(BAB, AC):
+def bomb(BAB, AC, amnt = 3, damage = 4):
     crit = False
     hit = False
     roller = roll(20)
@@ -46,9 +49,9 @@ def bomb(BAB, AC):
         hit = False
     if hit:
         if crit:
-            return [roll(6)+roll(6)+roll(6)+roll(6)+8, "Critical Hit!"]
+            return [roll(6,amnt+1)+2*damage, "Critical Hit!"]
         else:
-            return [roll(6)+roll(6)+roll(6)+4, "Hit"]
+            return [roll(6, amnt)+damage, "Hit"]
     else:
         return [0, "Miss"]
 
@@ -64,3 +67,4 @@ def ranpop(number, length):
         j = random.randrange(0,ln)
         nms.append(lst.pop(j))
     return nms
+

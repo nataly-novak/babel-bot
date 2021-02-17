@@ -15,7 +15,7 @@ from scheduler import maketimetable, addevent, geteventlist, convertlist, remeve
 from pombase import makepombases, checkgame, setgame, setuserval,getuserval, setraidstat, getraidstat, getaction
 from pommer import Pommer
 from stamper import line_update
-from mechanics import ranpop
+from mechanics import ranpop, roll
 from raid import  Raid
 
 import os
@@ -85,9 +85,10 @@ bot.evrole = []
 bot.keepers = 0
 bot.isgame = checkgame(conn)
 bot.congrats = 0
-bot.current_raid = Raid("",0,"")
+bot.current_raid = getraidstat(conn)
 bot.current_raiders = {}
 bot.raider_actions = {}
+bot.damagers = []
 
 @bot.event
 async def on_ready():
@@ -358,6 +359,7 @@ async def on_raw_reaction_add(payload):
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.pin()
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "⚔" and payload.member.bot == False:
+            bot.current_raid = getraidstat(conn)
             print("it's alive")
             looper.start()
             bot.raidstatus = 2
@@ -378,7 +380,7 @@ async def on_raw_reaction_add(payload):
                 bot.current_raiders[str(payload.member.id)]=(getuserval(conn, payload.member.id))
                 print("exist")
             else:
-                bot.current_raiders[str(payload.member.id)]=(Pommer(str(payload.member.id), 50))
+                bot.current_raiders[str(payload.member.id)]=(Pommer(str(payload.member.id)))
                 print("new")
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "💤" and payload.member.bot == False:
             print("it's alive")
@@ -407,42 +409,85 @@ async def on_raw_reaction_add(payload):
 
             if len(bot.raid_members) ==0:
                 damage = 0
+                bot.current_raid.vhp = min(bot.current_raid.vhp, 500)
                 print(bot.current_raid.stamp, bot.current_raid.mmbr)
                 print("__________________")
                 selector = []
                 for i in bot.current_raiders:
                     bot.current_raiders[i].ac = 15
                     selector.append(bot.current_raiders[i].user)
+                    if bot.current_raiders[i].hp == 0:
+                        bot.current_raiders[i].staggered = 0
                 for i in bot.current_raiders:
-                    user = bot.current_raiders[i].user
-
-                    command = getaction(bot.raider_actions[i])
-                    if command in ["sword", "axe", "fire"]:
-                        result = bot.current_raiders[i].action(command, bot.current_raid.ac)
-                        print(result," RESULT")
-                        damage += result[0]
-                    elif command == "defence":
-                        ln = len(bot.current_raiders)
-                        nm = min(3, max(ln//3, 1))
-                        lst = ranpop(nm, ln)
-                        print("LST: ", lst)
-                        for j in lst:
-                            print("I: ",j)
-                            bot.current_raiders[selector[j]].action("defence",1)
-                    elif command == "heal":
-                        for j in bot.current_raiders:
-                            bot.current_raiders[j].action("heal", 0)
-                    print(str(bot.current_raiders[i]))
+                    if bot.current_raiders[i].staggered == 2:
+                        command = getaction(bot.raider_actions[i])
+                        if command in ["sword", "axe", "fire"]:
+                            add = len(selector)-1
+                            result = bot.current_raiders[i].action(command, bot.current_raid.ac, add)
+                            print(result," RESULT")
+                            damage += result[0]
+                            bot.damagers.append([result[0], bot.current_raiders[i].user])
+                        elif command == "defence":
+                            ln = len(bot.current_raiders)
+                            nm = min(3, max(ln//3, 1))
+                            lst = ranpop(nm, ln)
+                            print("LST: ", lst)
+                            for j in lst:
+                                print("I: ",j)
+                                bot.current_raiders[selector[j]].action("defence",1)
+                            bot.damagers.append([0, bot.current_raiders[i].user])
+                        elif command == "heal":
+                            for j in bot.current_raiders:
+                                bot.current_raiders[j].action("heal", 0)
+                            bot.damagers.append([0, bot.current_raiders[i].user])
+                        print(str(bot.current_raiders[i]))
+                    else:
+                        bot.damagers.append([0, bot.current_raiders[i].user])
+                useless = 0
+                destruction = False
+                for i in bot.current_raiders:
+                    if bot.current_raiders[i].staggered < 2:
+                        useless+=1
+                print(useless)
+                if useless > len(bot.current_raiders)//2:
+                    destruction = True
+                    print("TRUUUUU")
+                if not destruction:
+                    if bot.current_raid.trg>0:
+                        n = max(1,len(bot.damagers)//2)
+                        amnt = roll(n)
+                        atk = ranpop(amnt,n)
+                        for i in atk:
+                            damaged = bot.current_raiders[bot.damagers[i][1]]
+                            dam = bot.current_raid.physical(damaged.ac)
+                            res=bot.current_raiders[bot.damagers[i][1]].suffer(dam[0])
+                            print("RESULT ", res)
+                            print(str(bot.current_raiders[bot.damagers[i][1]]))
+                        bot.current_raid.trg -=1
+                    else:
+                        for i in selector:
+                            staggered = roll(2)
+                            if staggered == 2:
+                                bot.current_raiders[i].staggered = 0
+                                print("Staggered", i)
+                            bot.current_raid.trg = roll(4)+6
+                else:
+                    res = bot.current_raid.burn()
+                    print("Burned", res)
+                for i in bot.current_raiders:
+                    bot.current_raiders[i].staggered += 1
                     setuserval(conn, bot.current_raiders[i])
+
 
 
                 print("__________________")
                 bot.current_raid.bhp-=damage
-                print("hp: ", bot.current_raid.bhp)
+                print(str(bot.current_raid))
                 setraidstat(conn, bot.current_raid)
                 bot.raidstatus = 0
                 bot.raider_actions = {}
                 bot.current_raiders = {}
+                bot.damagers = []
 
 
 

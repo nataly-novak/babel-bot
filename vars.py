@@ -1,0 +1,12 @@
+player_hp = 100
+player_ac = 15
+player_bab = 10
+pommer_damage = 3
+dragon_ac = 15
+dragon_bab = 6
+dragon_damage = 7
+dragon_hp = 666
+village_hp = 500
+bomb_dies = 3
+breath_dies = 10
+trigger_start = 3
