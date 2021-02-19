@@ -109,7 +109,31 @@ async def on_ready():
     updater.start()
 
 
-
+@bot.event
+async def on_guild_join(guild):
+    for channel in guild.text_channels:
+        print(channel.name)
+        if checkchan(channel.name):
+            print(channel.name)
+            addlanguage(conn, channel.name, channel.id)
+        elif channel.name == "event-announcements":
+            print(channel.id)
+            print(channel.name)
+            bot.eventchan = channel.id
+        elif channel.name == "common-room":
+            print(channel.id)
+            bot.common = channel.id
+        elif channel.name == "keepers-table":
+            bot.keepers = channel.id
+    for role in guild.roles:
+        line = str(role.name)
+        print(line)
+        if line == "Events":
+            print("!!!!!")
+            print(role.name)
+            bot.evrole.append(role)
+    if bot.evrole:
+        print(bot.evrole[0].id)
 
 
 @bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
