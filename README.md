@@ -24,9 +24,14 @@ If you wrote it wrong - /del removes last quote. Please stay civil and don't del
 
 /info command gives information about key koai concepts
 
-/raid prints link to raid timer
+/raid shows the initialisation of the raid timer. Shield emoji allows you to join
+the announced raid. After everyone has joined, press the sword emoji to proceed.
+Joining allows you to be mentioned after the raid is done
 
-/invite prints KOAI invite link
+/break initializes the break timer. Bed emoji allows you to join the break Zzz emoji
+starts the break.
+
+/invite prints KOAI invite link. Print /invite koa to get KOA invitation
 
 /coin flips a coin for you
 

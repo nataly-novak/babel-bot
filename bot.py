@@ -318,13 +318,19 @@ async def ran(ctx, number, amount = 1):
 
 @bot.command(name = 'inquire', help="Works from dm only, allows you to message keepers, put the message into quotes",pass_context=True)
 async def inquire(ctx, message):
-    if not ctx.guild:
-        sender = ctx.author.mention
-        keep = bot.get_channel(bot.keepers)
-        await keep.send(sender+" "+message)
-        await ctx.send("Thank you! The Keepers will read your message as soon as possible and contact you if necessary")
-    else:
-        await ctx.send("This is a DM-only command")
+    is_member = False
+    for guild in bot.guilds:
+        if guild.get_member(ctx.author.id):
+            print("incoming from member")
+            is_member = True
+    if is_member:
+        if not ctx.guild:
+            sender = ctx.author.mention
+            keep = bot.get_channel(bot.keepers)
+            await keep.send(sender+" "+message)
+            await ctx.send("Thank you! The Keepers will read your message as soon as possible and contact you if necessary")
+        else:
+            await ctx.send("This is a DM-only command")
 
 
 
