@@ -483,6 +483,8 @@ async def event(ctx, day="", time="", channel="", name=""):
         for i in ev:
             line = str(i[0])+": "+str(i[1])+" "+str(i[2]).rsplit(sep=':',maxsplit=1)[0]+" "+ str(i[3]) + " "+i[4]+"\n"
             message += line
+        if message =="":
+            message = "Empty schedule"
         await ctx.send(message)
 
 
