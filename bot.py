@@ -213,8 +213,8 @@ async def raid(ctx, times = '25'):
             await sent.pin()
             bot.on_raid = True
             bot.raidbreak = True
-            await sent.add_reaction("🗡")
-            await sent.add_reaction("⚔")
+            await sent.add_reaction("🛡️")
+            await sent.add_reaction("🗡️")
             bot.raidstatus = 1
 
         else:
@@ -346,7 +346,7 @@ async def on_raw_reaction_add(payload):
             remain = "```RAID IS BEGINNING: "+str(bot.raidlen-bot.minutes+1)+" MINUTES TO GO```"
             await channel.send("```RAID HAS STARTED!```")
             await raider.edit(content=remain)
-        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛡️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "💤" and payload.member.bot == False:
             print("it's alive")
@@ -371,12 +371,12 @@ async def on_raw_reaction_remove(payload):
             print("emoji_removed")
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.unpin()
-        elif payload.message_id == bot.raid_id and (bot.raidstatus == 2 or bot.raidstatus == 1)  and payload.emoji.name == "🗡" :
+        elif payload.message_id == bot.raid_id and (bot.raidstatus == 2 or bot.raidstatus == 1)  and payload.emoji.name == "🛡️" :
             raidmsg = await bot.get_channel(chan).fetch_message(bot.raid_id)
             reacs = raidmsg.reactions
             raiders = []
             for i in reacs:
-                if i.emoji == "🗡":
+                if i.emoji == "🛡️":
                     async for user in i.users():
                         raiders.append(user.id)
             print(raiders)
