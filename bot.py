@@ -12,6 +12,7 @@ from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 from languages import checkrole, roletochan, addlanguage, languagedb, checkchan
 from randomer import coin, rannum
 from scheduler import maketimetable, addevent, geteventlist, convertlist, remevent
+from rules import ruleprint
 
 import os
 import psycopg2
@@ -162,13 +163,30 @@ async def de(ctx):
         await ctx.send(message)
 
 
-@bot.command(name='quotenumber', help='deletes last quote', pass_context=True)
+@bot.command(name='quotenumber', help='Shows the current number of quotes', pass_context=True)
 async def quotenumber(ctx):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
         await ctx.message.delete()
         message = quotenum(conn)
         await ctx.send(message)
+
+@bot.command(name='rules', help='Prints rules in chosen language (or english if no translation provided)', pass_context=True)
+async def rules(ctx, language):
+    await ctx.message.delete()
+    message = ruleprint(language)
+    resps = message.split(sep="\n")
+    mes = ""
+    for i in resps:
+        mes = mes +i +"\n"
+        print(i)
+        print(mes)
+        print(len(mes))
+        if len(mes) >1500:
+            await ctx.send(mes)
+            mes = ""
+    await ctx.send(mes)
+
 
 
 @bot.command(name='addfunction', help='sets the channel for function', pass_context=True)
@@ -310,7 +328,7 @@ async def flip(ctx):
         await ctx.send(coin())
 
 
-@bot.command(name='rand', help='flips a coin',pass_context=True)
+@bot.command(name='rand', help='gives several random numbers in a range. First number is range, second is the number of winners',pass_context=True)
 async def ran(ctx, number, amount = 1):
     chan = ctx.message.channel.id
     if checksetting(conn, 'bot', chan):
