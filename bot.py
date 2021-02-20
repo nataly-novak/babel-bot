@@ -343,7 +343,7 @@ async def on_raw_reaction_add(payload):
         if payload.emoji.name == "📌":
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.pin()
-        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "⚔" and payload.member.bot == False:
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡️" and payload.member.bot == False:
             print("it's alive")
             looper.start()
             bot.raidstatus = 2
