@@ -559,7 +559,7 @@ async def schedule(ctx, zone = "UTC"):
         print(date_list)
         for i in ev:
             print(i)
-            if i[1] in date_list and  i[2].hour > datetime.datetime.utcnow().time().hour or (i[2].hour == datetime.datetime.utcnow().time().hour and i[2].minute >= datetime.datetime.utcnow().time().minute):
+            if i[1] in date_list and  (i[2].hour > datetime.datetime.utcnow().time().hour or (i[2].hour == datetime.datetime.utcnow().time().hour and i[2].minute >= datetime.datetime.utcnow().time().minute) or i[1] != date_list[0]):
                 if i[3] != -1:
                     channel = bot.get_channel(i[3])
                 else:
