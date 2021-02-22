@@ -53,7 +53,7 @@ else:
     )
 cur = conn.cursor()
 
-cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
+#cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
 
 settingsdb(conn)
 makedb(conn)
@@ -216,8 +216,8 @@ async def raid(ctx, times = '25'):
             await sent.pin()
             bot.on_raid = True
             bot.raidbreak = True
+            await sent.add_reaction("🛡️")
             await sent.add_reaction("🗡")
-            await sent.add_reaction("⚔")
             bot.raidstatus = 1
             if getraidstat(conn):
                 bot.current_raid = getraidstat(conn)
@@ -360,7 +360,7 @@ async def on_raw_reaction_add(payload):
         if payload.emoji.name == "📌":
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.pin()
-        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "⚔" and payload.member.bot == False:
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
             bot.current_raid = getraidstat(conn)
             print("it's alive")
             looper.start()
@@ -376,7 +376,7 @@ async def on_raw_reaction_add(payload):
             bot.current_raid.mmbr = raidlist
             await channel.send("```RAID HAS STARTED!```")
             await raider.edit(content=remain)
-        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛡️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
             if getuserval(conn,payload.member.id):
                 bot.current_raiders[str(payload.member.id)]=(getuserval(conn, payload.member.id))
@@ -452,7 +452,7 @@ async def on_raw_reaction_add(payload):
                                     def_name = user.name
                                 defs = defs + def_name+", "
                             bot.damagers.append([0, bot.current_raiders[i].user])
-                            message = message+ name +" uses" + command + " to defend "+ defs +" it increases their defence by 1\n"
+                            message = message+ name +" uses " + command + " to defend "+ defs +" it increases their defence by 1\n"
 
                         elif command == "heal":
                             for j in bot.current_raiders:
@@ -508,15 +508,16 @@ async def on_raw_reaction_add(payload):
                 else:
                     res = bot.current_raid.burn()
                     print("Burned", res)
-                    message += message+ "The dragon uses it's breath on the village and deals " +str(res[0]) + "damage. "+str(bot.current_raid.vhp) +" hp remains\n"
+                    message = message+ "The dragon uses it's breath on the village and deals " +str(res[0]) + "damage. "+str(bot.current_raid.vhp) +" hp remains\n"
                 for i in bot.current_raiders:
                     bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered+1)
                     setuserval(conn, bot.current_raiders[i])
 
 
-
                 print("__________________")
                 bot.current_raid.bhp-=damage
+
+                message = message +"The dragon has "+str(bot.current_raid.bhp)+ " HP\n"
                 print(str(bot.current_raid))
                 setraidstat(conn, bot.current_raid)
                 bot.raidstatus = 0
@@ -530,6 +531,14 @@ async def on_raw_reaction_add(payload):
 
 
 
+
+@bot.command(name="myhp", help ="shows your current hp", pass_context = True)
+async def myhp(ctx):
+    player = (ctx.author.id)
+    raider = getuserval(conn,player)
+    print(raider.hp)
+    message = "Your hp is " + str(raider.hp)
+    await ctx.send(message)
 
 
 
@@ -548,7 +557,7 @@ async def on_raw_reaction_remove(payload):
             reacs = raidmsg.reactions
             raiders = []
             for i in reacs:
-                if i.emoji == "🗡":
+                if i.emoji == "🛡️":
                     async for user in i.users():
                         raiders.append(user.id)
             print(raiders)
