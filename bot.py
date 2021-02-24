@@ -53,7 +53,7 @@ else:
     )
 cur = conn.cursor()
 
-#cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
+cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
 
 settingsdb(conn)
 makedb(conn)
@@ -91,6 +91,7 @@ bot.current_raiders = {}
 bot.raider_actions = {}
 bot.damagers = []
 bot.guild = None
+bot.debuf_counter = 0
 
 @bot.event
 async def on_ready():
@@ -196,16 +197,9 @@ async def raid(ctx, times = '25'):
     chan = ctx.message.channel.id
     if checksetting(conn, 'accountability', chan):
         if len(bot.raid_members) !=0:
+            await game_process()
             bot.raid_members = []
-            print(bot.current_raid.stamp, bot.current_raid.mmbr)
-            for i in bot.current_raiders:
-                user = i.user
-                print(bot.raider_actions[user])
-                setuserval(conn, i)
-            setraidstat(conn, bot.current_raid)
-            bot.raidstatus = 0
-            bot.raider_actions = {}
-            bot.current_raiders = {}
+
         if bot.on_raid == False:
             bot.raidlen = int(times)
             message = "```WAITING FOR RAID OF " +times+  " MINUTES TO START.....```"
@@ -227,6 +221,17 @@ async def raid(ctx, times = '25'):
             message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
             await ctx.send(message)
             await ctx.message.delete()
+
+
+@bot.command(name='cancel', help='cancels raid',pass_context = True)
+async def cancel(ctx):
+    if bot.raidstatus ==1:
+        bot.on_raid = False
+        bot.raidstatus = 0
+        bot.raid_members = []
+        bot.current_raiders = {}
+        await ctx.send("```THE RAID WAS CANCELED```")
+
 
 @bot.command(name='break',help='prints link to raid room',pass_context=True)
 async def breaks(ctx, times = '5'):
@@ -395,9 +400,15 @@ async def on_raw_reaction_add(payload):
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛏️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
         elif payload.message_id == bot.congrats and bot.raidstatus == 4 and payload.emoji.name in ["🗡", "🛡️", "💊", "⛏", "💣","❓"] and payload.member.bot == False:
-            player = payload.member.id
-            bot.raid_members.remove(player)
-            raider = bot.current_raiders[str(player)]
+            if payload.emoji.name != "❓" or bot.debuf_counter == 0:
+                player = payload.member.id
+                bot.raid_members.remove(player)
+                raider = bot.current_raiders[str(player)]
+                if payload.emoji.name == "❓":
+                    bot.debuf_counter = 1
+            else:
+                channel = bot.get_channel(bot.account_id)
+                await channel.send(payload.member.mention + " the debuff was already used, chose another emoji\n")
 
             print(raider.poms+"t")
             print("________________")
@@ -410,122 +421,9 @@ async def on_raw_reaction_add(payload):
 
 
             if len(bot.raid_members) ==0:
-                message = ""
-                damage = 0
-                bot.current_raid.vhp = min(bot.current_raid.vhp, 500)
-                print(bot.current_raid.stamp, bot.current_raid.mmbr)
-                print("__________________")
-                selector = []
-                for i in bot.current_raiders:
-                    bot.current_raiders[i].ac = 15
-                    selector.append(bot.current_raiders[i].user)
-                    if bot.current_raiders[i].hp == 0:
-                        bot.current_raiders[i].staggered = 0
-                for i in bot.current_raiders:
-                    user = bot.guild.get_member(int(bot.current_raiders[i].user))
-                    if user.nick:
-                        name = user.nick
-                    else:
-                        name = user.name
-                    if bot.current_raiders[i].staggered == 2:
-                        command = getaction(bot.raider_actions[i])
-                        if command in ["sword", "axe", "fire"]:
-                            add = len(selector)-1
-                            result = bot.current_raiders[i].action(command, bot.current_raid.ac, add)
-                            print(result," RESULT")
-                            damage += result[0]
-                            bot.damagers.append([result[0], bot.current_raiders[i].user])
-                            message = message + name+ " uses "+ command +". It's a "+ result[1] + " with "+ str(result[0]) + " damage\n"
-                        elif command == "defence":
-                            ln = len(bot.current_raiders)
-                            nm = min(max_shields, max(ln//3, 1))
-                            lst = ranpop(nm, ln)
-                            print("LST: ", lst)
-                            defs = ""
-                            for j in lst:
-                                print("I: ",j)
-                                bot.current_raiders[selector[j]].action("defence",1)
-                                defended = bot.guild.get_member(int(selector[j]))
-                                if defended.nick:
-                                    def_name = user.nick
-                                else:
-                                    def_name = user.name
-                                defs = defs + def_name+", "
-                            bot.damagers.append([0, bot.current_raiders[i].user])
-                            message = message+ name +" uses " + command + " to defend "+ defs +" it increases their defence by 1\n"
-
-                        elif command == "heal":
-                            for j in bot.current_raiders:
-                                res = bot.current_raiders[j].action("heal", channeling())
-                            message = message + name +" uses "+ command + " to heal "+ str(res[0]) +" hp to everyone!\n"
-                            bot.damagers.append([0, bot.current_raiders[i].user])
-
-                        print(str(bot.current_raiders[i]))
-                    else:
-                        bot.damagers.append([0, bot.current_raiders[i].user])
-                        message = message+ name + " is staggered and can't do anything\n"
-                useless = 0
-                destruction = False
-                for i in bot.current_raiders:
-                    if bot.current_raiders[i].staggered < 2:
-                        useless+=1
-                print(useless)
-                if useless > len(bot.current_raiders)//2:
-                    destruction = True
-                    print("TRUUUUU")
-                if not destruction:
-                    if bot.current_raid.trg>0:
-                        n = max(1,len(bot.damagers)//2)
-                        amnt = roll(n)
-                        atk = ranpop(amnt,n)
-                        for i in atk:
-                            damaged = bot.current_raiders[bot.damagers[i][1]]
-                            defended = bot.guild.get_member(int(damaged.user))
-                            if defended.nick:
-                                def_name = user.nick
-                            else:
-                                def_name = user.name
-                            dam = bot.current_raid.physical(damaged.ac)
-                            res=bot.current_raiders[bot.damagers[i][1]].suffer(dam[0])
-                            print("RESULT ", res)
-                            print(str(bot.current_raiders[bot.damagers[i][1]]))
-                            message = message+"Dragon attacks "+def_name+"! It's a "+ dam[1]+ " with "+ str(dam[0]) +" damage!\n"
-                        bot.current_raid.trg -=1
-                    else:
-                        message = message + "Dragon uses it's breath!\n"
-                        for i in selector:
-                            staggered = roll(2)
-                            if staggered == 2:
-                                bot.current_raiders[i].staggered = 0
-                                print("Staggered", i)
-                                defended = bot.guild.get_member(int(bot.current_raiders[i].user))
-                                if defended.nick:
-                                    def_name = user.nick
-                                else:
-                                    def_name = user.name
-                                message = message+def_name+ "is staggered for the next round"
-                            bot.current_raid.trg = roll(breath_roll)+breath_cooldown
-                else:
-                    res = bot.current_raid.burn()
-                    print("Burned", res)
-                    message = message+ "The dragon uses it's breath on the village and deals " +str(res[0]) + "damage. "+str(bot.current_raid.vhp) +" hp remains\n"
-                for i in bot.current_raiders:
-                    bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered+1)
-                    setuserval(conn, bot.current_raiders[i])
+                await game_process()
 
 
-                print("__________________")
-                bot.current_raid.bhp-=damage
-
-                message = message +"The dragon has "+str(bot.current_raid.bhp)+ " HP\n"
-                print(str(bot.current_raid))
-                setraidstat(conn, bot.current_raid)
-                bot.raidstatus = 0
-                bot.raider_actions = {}
-                bot.current_raiders = {}
-                bot.damagers = []
-                protocol = bot.get_channel(getchannel(conn,"game"))
-                await protocol.send(message)
 
 
 
@@ -552,7 +450,7 @@ async def on_raw_reaction_remove(payload):
             print("emoji_removed")
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.unpin()
-        elif payload.message_id == bot.raid_id and (bot.raidstatus == 2 or bot.raidstatus == 1)  and payload.emoji.name == "🗡" :
+        elif payload.message_id == bot.raid_id and (bot.raidstatus == 2 or bot.raidstatus == 1)  and payload.emoji.name == "🛡️" :
             raidmsg = await bot.get_channel(chan).fetch_message(bot.raid_id)
             reacs = raidmsg.reactions
             raiders = []
@@ -568,6 +466,7 @@ async def on_raw_reaction_remove(payload):
             if bot.raid_members == []:
                 print(bot.raid_members)
                 looper.cancel()
+                print("CANCELATION")
 
 
 
@@ -659,11 +558,11 @@ async def raid_done():
                 await sent.add_reaction("🗡")
                 await sent.add_reaction("🛡️")
                 await sent.add_reaction("💊")
-                if len(bot.raid_members)>3:
+                if len(bot.raid_members)>0:
                     await sent.add_reaction("⛏")
-                if len(bot.raid_members)>5:
+                if len(bot.raid_members)>0:
                     await sent.add_reaction("💣")
-                if len(bot.raid_members)>7:
+                if len(bot.raid_members)>0:
                     await sent.add_reaction("❓")
                 bot.congrats = sent.id
                 bot.raidstatus = 4
@@ -674,8 +573,9 @@ async def raid_done():
 
 
         else:
-            message = "Sorry, everyone left"
+            message = "```Sorry, everyone left```"
             await channel.send(message)
+            bot.raidstatus = 0
 
 
 
@@ -786,7 +686,146 @@ async def updater():
 
 
 
+async def game_process():
+    message = ""
+    damage = 0
+    bot.current_raid.vhp = min(bot.current_raid.vhp, 500)
+    print(bot.current_raid.stamp, bot.current_raid.mmbr)
+    print("__________________")
+    selector = []
+    if bot.current_raid.effect != "":
+        bot.current_raid.effect !=""
+    for i in bot.current_raiders:
+        if i in bot.damagers:
+            bot.current_raiders[i].ac = 15
+            selector.append(bot.current_raiders[i].user)
+        if bot.current_raiders[i].hp == 0:
+            bot.current_raiders[i].staggered = 0
+    z = None
+    for i in bot.current_raiders:
+        if i in bot.raider_actions:
+            command = getaction(bot.raider_actions[i])
+            if command == "debuff":
+                message = bot.current_raid.mystery()
+                bot.raider_actions.pop(i, None)
+                z = i
+    bot.current_raiders.pop(z, None)
+    for i in bot.current_raiders:
+        if i in bot.raider_actions:
+            user = bot.guild.get_member(int(bot.current_raiders[i].user))
+            if user.nick:
+                name = user.nick
+            else:
+                name = user.name
+            if bot.current_raiders[i].staggered == 2:
+                command = getaction(bot.raider_actions[i])
+                if command in ["sword", "axe", "fire"]:
+                    add = len(selector) - 1
+                    result = bot.current_raiders[i].action(command, bot.current_raid.ac, add)
+                    print(result, " RESULT")
+                    damage += result[0]
+                    bot.damagers.append([result[0], bot.current_raiders[i].user])
+                    message = message + name + " uses " + command + ". It's a " + result[1] + " with " + str(
+                        result[0]) + " damage\n"
+                elif command == "defence":
+                    ln = len(bot.current_raiders)
+                    nm = min(max_shields, max(ln // 3, 1))
+                    lst = ranpop(nm, ln)
+                    print("LST: ", lst)
+                    defs = ""
+                    for j in lst:
+                        print("I: ", j)
+                        bot.current_raiders[selector[j]].action("defence", 1)
+                        defended = bot.guild.get_member(int(selector[j]))
+                        if defended.nick:
+                            def_name = user.nick
+                        else:
+                            def_name = user.name
+                        defs = defs + def_name + ", "
+                    bot.damagers.append([0, bot.current_raiders[i].user])
+                    message = message + name + " uses " + command + " to defend " + defs + " it increases their defence by 1\n"
 
+                elif command == "heal":
+                    for j in bot.current_raiders:
+                        res = bot.current_raiders[j].action("heal", channeling())
+                    message = message + name + " uses " + command + " to heal " + str(res[0]) + " hp to everyone!\n"
+                    bot.damagers.append([0, bot.current_raiders[i].user])
+                print(str(bot.current_raiders[i]))
+            else:
+                bot.damagers.append([0, bot.current_raiders[i].user])
+                message = message + name + " is staggered and can't do anything\n"
+    useless = 0
+    destruction = False
+    if bot.current_raid.effect != "stagger":
+        if len(bot.damagers) >0:
+            for i in bot.current_raiders:
+                if bot.current_raiders[i].staggered < 2:
+                    useless += 1
+            print(useless)
+            if useless > len(bot.current_raiders) // 2:
+                destruction = True
+                print("TRUUUUU")
+            if not destruction:
+                if bot.current_raid.trg > 0:
+                        n = max(1, len(bot.damagers) // 2)
+                        amnt = roll(n)
+                        atk = ranpop(amnt, n)
+                        for i in atk:
+                            damaged = bot.current_raiders[bot.damagers[i][1]]
+                            defended = bot.guild.get_member(int(damaged.user))
+                            if defended.nick:
+                                def_name = user.nick
+                            else:
+                                def_name = user.name
+                            dam = bot.current_raid.physical(damaged.ac)
+                            res = bot.current_raiders[bot.damagers[i][1]].suffer(dam[0])
+                            print("RESULT ", res)
+                            print(str(bot.current_raiders[bot.damagers[i][1]]))
+                            message = message + "Dragon attacks " + def_name + "! It's a " + dam[1] + " with " + str(
+                                dam[0]) + " damage!\n"
+                        bot.current_raid.trg -= 1
+                else:
+                    message = message + "Dragon uses it's breath!\n"
+                    for i in selector:
+                        staggered = roll(2)
+                        if staggered == 2:
+                            bot.current_raiders[i].staggered = 0
+                            print("Staggered", i)
+                            defended = bot.guild.get_member(int(bot.current_raiders[i].user))
+                            if defended.nick:
+                                def_name = user.nick
+                            else:
+                                def_name = user.name
+                            message = message + def_name + "is staggered for the next round\n"
+                        bot.current_raid.trg = roll(breath_roll) + breath_cooldown
+            else:
+                res = bot.current_raid.burn()
+                print("Burned", res)
+                message = message + "The dragon uses it's breath on the village and deals " + str(res[0]) + "damage. " + str(bot.current_raid.vhp) + " hp remains\n"
+            for i in bot.current_raiders:
+                bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered + 1)
+                setuserval(conn, bot.current_raiders[i])
+        else:
+            message = message + "Something went wrong, no one attacked\n"
+    else:
+        message = message + "The dragon did nothing due to your action \n"
+
+    print("__________________")
+    mult = 1
+    if bot.current_raid.effect == "stagger":
+        mult = 1.5
+    bot.current_raid.bhp -= mult*damage
+
+    message = message + "The dragon has " + str(bot.current_raid.bhp) + " HP\n"
+    print(str(bot.current_raid))
+    setraidstat(conn, bot.current_raid)
+    bot.raidstatus = 0
+    bot.raider_actions = {}
+    bot.current_raiders = {}
+    bot.damagers = []
+    protocol = bot.get_channel(getchannel(conn, "game"))
+    await protocol.send(message)
+    bot.debuf_counter = 0
 
 
 

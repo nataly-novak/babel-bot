@@ -22,8 +22,8 @@ def makepombases(conn):
                     BAB INT NOT NULL,
                     AC INT NOT NULL,
                     SAVE INT NOT NULL, 
-                    DAMAGE INT NOT NULL 
-
+                    DAMAGE INT NOT NULL, 
+                    EFFECT CHAR(20) 
                     );''')
         print("Table created successfully")
         cur.execute('ALTER TABLE pombase ADD CONSTRAINT pom_key PRIMARY KEY (NMB);')
@@ -136,11 +136,11 @@ def getraidstat(conn):
     if ar == -1:
         return Raid("",0,"")
     else:
-        cur.execute("SELECT STAMP, AMNT, MMBR,ACTS,TRIGGERED, ATTACKS, BHP, VHP, BAB, AC, SAVE, DAMAGE  FROM pombase WHERE NMB = %s",(ar,))
+        cur.execute("SELECT STAMP, AMNT, MMBR,ACTS,TRIGGERED, ATTACKS, BHP, VHP, BAB, AC, SAVE, DAMAGE, EFFECT  FROM pombase WHERE NMB = %s",(ar,))
         resp = (cur.fetchone())
         for i in resp:
             print(i)
-        return Raid(str(resp[0]), resp[1], resp[2].rstrip(), resp[3].rstrip(), resp[4], resp[5].rstrip, resp[6], resp[7], resp[8], resp[9], resp[10], resp[11] )
+        return Raid(str(resp[0]), resp[1], resp[2].rstrip(), resp[3].rstrip(), resp[4], resp[5].rstrip, resp[6], resp[7], resp[8], resp[9], resp[10], resp[11], resp[12].rstrip() )
 
 
 
@@ -152,7 +152,7 @@ def setraidstat(conn, raid: Raid):
         ar = 0
     else:
         ar = int(a[1:-2]) + 1
-    cur.execute("INSERT INTO pombase VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s)",(str(ar), str(raid.stamp),str(raid.amnt),str(raid.mmbr),str(raid.acts), str(raid.trg), str(raid.attacks), str(raid.bhp), str(raid.vhp),str(raid.bab), str(raid.ac), str(raid.save), str(raid.damage) ) )
+    cur.execute("INSERT INTO pombase VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)",(str(ar), str(raid.stamp),str(raid.amnt),str(raid.mmbr),str(raid.acts), str(raid.trg), str(raid.attacks), str(raid.bhp), str(raid.vhp),str(raid.bab), str(raid.ac), str(raid.save), str(raid.damage), str(raid.effect)) )
     conn.commit()
 
 def getaction(emoji):
