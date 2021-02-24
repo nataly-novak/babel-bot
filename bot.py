@@ -693,23 +693,30 @@ async def game_process():
     print(bot.current_raid.stamp, bot.current_raid.mmbr)
     print("__________________")
     selector = []
+
     if bot.current_raid.effect != "":
         bot.current_raid.effect !=""
     for i in bot.current_raiders:
-        if i in bot.damagers:
-            bot.current_raiders[i].ac = 15
-            selector.append(bot.current_raiders[i].user)
+        bot.current_raiders[i].ac = 15
+        selector.append(bot.current_raiders[i].user)
+        print("RAIDER",bot.current_raiders[i].user)
         if bot.current_raiders[i].hp == 0:
             bot.current_raiders[i].staggered = 0
-    z = None
+    print(selector)
+
     for i in bot.current_raiders:
         if i in bot.raider_actions:
-            command = getaction(bot.raider_actions[i])
-            if command == "debuff":
-                message = bot.current_raid.mystery()
-                bot.raider_actions.pop(i, None)
-                z = i
-    bot.current_raiders.pop(z, None)
+            if bot.current_raiders[i].staggered == 2:
+                command = getaction(bot.raider_actions[i])
+                if command == "debuff":
+                    user = bot.guild.get_member(int(bot.current_raiders[i].user))
+                    if user.nick:
+                        name = user.nick
+                    else:
+                        name = user.name
+                    message = message + name + " uses the mysterious attack!"+bot.current_raid.mystery()
+                    bot.damagers.append([20, bot.current_raiders[i].user])
+
     for i in bot.current_raiders:
         if i in bot.raider_actions:
             user = bot.guild.get_member(int(bot.current_raiders[i].user))
@@ -754,6 +761,14 @@ async def game_process():
             else:
                 bot.damagers.append([0, bot.current_raiders[i].user])
                 message = message + name + " is staggered and can't do anything\n"
+        else:
+            user = bot.guild.get_member(int(bot.current_raiders[i].user))
+            if user.nick:
+                name = user.nick
+            else:
+                name = user.name
+            bot.damagers.append([0, bot.current_raiders[i].user])
+            message = message + name + " seems to be staggered and can't do anything\n"
     useless = 0
     destruction = False
     if bot.current_raid.effect != "stagger":
@@ -786,37 +801,53 @@ async def game_process():
                         bot.current_raid.trg -= 1
                 else:
                     message = message + "Dragon uses it's breath!\n"
+                    print("breath attack")
+                    print(selector)
                     for i in selector:
                         staggered = roll(2)
                         if staggered == 2:
-                            bot.current_raiders[i].staggered = 0
+                            bot.current_raiders[i].staggered = -1
                             print("Staggered", i)
                             defended = bot.guild.get_member(int(bot.current_raiders[i].user))
                             if defended.nick:
                                 def_name = user.nick
                             else:
                                 def_name = user.name
-                            message = message + def_name + "is staggered for the next round\n"
+                            message = message + def_name + " is staggered for the next round\n"
+                        else:
+                            print("Evaded", i)
+                            defended = bot.guild.get_member(int(bot.current_raiders[i].user))
+                            if defended.nick:
+                                def_name = user.nick
+                            else:
+                                def_name = user.name
+                            message = message + def_name + " evaded the dragon's fire!\n"
                         bot.current_raid.trg = roll(breath_roll) + breath_cooldown
             else:
                 res = bot.current_raid.burn()
                 print("Burned", res)
-                message = message + "The dragon uses it's breath on the village and deals " + str(res[0]) + "damage. " + str(bot.current_raid.vhp) + " hp remains\n"
+                message = message + "The dragon uses it's breath on the village and deals " + str(res[0]) + " damage. " + str(bot.current_raid.vhp) + " hp remains\n"
             for i in bot.current_raiders:
-                bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered + 1)
+                bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered + 2)
                 setuserval(conn, bot.current_raiders[i])
         else:
-            message = message + "Something went wrong, no one attacked\n"
+            message = message + "Something went wrong\n"
     else:
         message = message + "The dragon did nothing due to your action \n"
 
     print("__________________")
     mult = 1
-    if bot.current_raid.effect == "stagger":
+    if bot.current_raid.effect == "vulnerable":
         mult = 1.5
     bot.current_raid.bhp -= mult*damage
-
+    if bot.current_raid.bhp<0:
+        bot.current_raid.bhp = 0
     message = message + "The dragon has " + str(bot.current_raid.bhp) + " HP\n"
+    if bot.current_raid.bhp == 0:
+        message = message + "THE DRAGON WAS DEFEATED! CONGRATULATIONS!\n"
+
+
+
     print(str(bot.current_raid))
     setraidstat(conn, bot.current_raid)
     bot.raidstatus = 0

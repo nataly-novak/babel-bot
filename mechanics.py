@@ -50,11 +50,11 @@ def bomb(BAB, AC, amnt = 3, damage = 4):
         hit = False
     if hit:
         if crit:
-            return [roll(6,amnt+1)+2*damage, "Critical Hit!"]
+            return [roll(6,amnt+1)+2*damage, "critical Hit!"]
         else:
-            return [roll(6, amnt)+damage, "Hit"]
+            return [roll(6, amnt)+damage, "hit"]
     else:
-        return [0, "Miss"]
+        return [0, "miss"]
 
 def channeling():
     return roll(6, channel_dies)

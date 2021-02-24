@@ -48,7 +48,7 @@ class Raid:
             self.trg = trigger_start + breath_cooldown
             message = "Dragon's next breath attack is delayed\n"
         elif self.effect == "hp":
-            self.hp -= 50
+            self.bhp -= 50
             message = "Dragon lost 50 hp\n"
         elif self.effect == "vulnerable":
             message = "Dragon is more vulnerable for this round\n"

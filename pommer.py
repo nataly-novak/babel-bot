@@ -19,7 +19,7 @@ class Pommer:
 
     def shield(self, bonus):
         self.ac += bonus
-        return[0, "Defended!"]
+        return[0, "defended!"]
 
     def sword(self, defence, additional):
         return attack(self.attack+additional, 6, self.damage, 2, defence)
@@ -32,17 +32,18 @@ class Pommer:
 
     def heal (self, healed):
         self.hp = min(self.hp+healed, 100)
-        self.staggered = 2
-        return [healed,"Healed!"]
+        if self.staggered == 0:
+            self.staggered = 1
+        return [healed,"healed!"]
 
     def suffer(self, amount):
         res= max(self.hp - amount, 0)
         self.hp = res
         if res ==0:
             self.staggered = 0
-            return [amount, "Staggered!"]
+            return [amount, "staggered!"]
         else:
-            return [amount, "Damaged!"]
+            return [amount, "damaged!"]
 
 
 
