@@ -49,6 +49,7 @@ filldb()
 help_items = worddicts()
 languagedb()
 maketimetable()
+makepombases()
 
 
 bot = commands.Bot(command_prefix=(getprefix()),intents=intents)
