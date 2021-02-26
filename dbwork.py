@@ -1,8 +1,35 @@
 import os
 import psycopg2
 import random
+from dotenv import load_dotenv
 
-def settingsdb(conn):
+
+def getconn():
+    load_dotenv()
+    STAGE = os.getenv('STAGE')
+    if STAGE == 'dev':
+        DATABASE_URL = os.environ['DATABASE_URL']
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
+    elif STAGE == 'local':
+        DATABASE_URL = os.environ['DATABASE_URL']
+        conn = psycopg2.connect(DATABASE_URL)
+
+    else:
+        PSQL_HOST = os.getenv('PSQL_HOST')
+        PSQL_USER = os.getenv('PSQL_USER')
+        PSQL_DATABASE = os.getenv('PSQL_DATABASE')
+        PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
+        conn = psycopg2.connect(
+            host=PSQL_HOST,
+            user=PSQL_USER,
+            dbname=PSQL_DATABASE,
+            password=PSQL_PASSWORD
+        )
+    return conn
+
+def settingsdb():
+    conn = getconn()
     cur = conn.cursor()
     print('settingsdb')
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('accountability',))
@@ -67,12 +94,15 @@ def settingsdb(conn):
     else:
         print('No need')
     conn.commit()
+    cur.close()
+    conn.close()
 
 
 
 
 
-def makedb(conn):
+def makedb():
+    conn = getconn()
     cur = conn.cursor()
 
     print('koai')
@@ -91,8 +121,11 @@ def makedb(conn):
     else:
         print('No need')
     conn.commit()
+    cur.close()
+    conn.close()
 
-def filldb(conn):
+def filldb():
+    conn = getconn()
     cur = conn.cursor()
     f = open("international", "r",encoding="utf8")
     f1 = f.readlines()
@@ -108,7 +141,8 @@ def filldb(conn):
     n = len(f1)
     f.close()
 
-def addsetting(conn, setting, value):
+def addsetting(setting, value):
+    conn = getconn()
     cur = conn.cursor()
     line0 = "SELECT MAX(NMB) FROM "+setting
     cur.execute(line0)
@@ -124,10 +158,13 @@ def addsetting(conn, setting, value):
     cur.execute(line2)
     rows = cur.fetchall()
     conn.commit()
+    cur.close()
+    conn.close()
 
 
 
-def removesetting(conn, setting, value):
+def removesetting(setting, value):
+    conn = getconn()
     cur = conn.cursor()
     line0 = "SELECT * FROM "+setting+" FETCH FIRST ROW ONLY;"
     cur.execute(line0)
@@ -148,8 +185,11 @@ def removesetting(conn, setting, value):
         cur.execute(line2)
         rows = cur.fetchall()
     conn.commit()
+    cur.close()
+    conn.close()
 
-def checksetting(conn, setting, value):
+def checksetting(setting, value):
+    conn = getconn()
     cur = conn.cursor()
     line0 = "SELECT * FROM " + setting + " FETCH FIRST ROW ONLY;"
     cur.execute(line0)
@@ -168,14 +208,18 @@ def checksetting(conn, setting, value):
         cur.execute(line1)
         a = str(cur.fetchone())
         if a.rstrip() != 'None':
-            return True
+            x = True
         else:
-            return False
+            x = False
     else:
-        return False
+        x = False
+    cur.close()
+    conn.close()
+    return x
 
 
-def randomquote(conn):
+def randomquote():
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT MAX(NUM) FROM inter;")
     r = str(cur.fetchone())
@@ -190,9 +234,12 @@ def randomquote(conn):
     cur.execute("SELECT LANG FROM inter WHERE NUM = %s", ([dd]))
     resp2 = str(cur.fetchone())
     response = response + ' - ' + resp2[2:-3].strip()
+    cur.close()
+    conn.close()
     return response
 
-def addquote(conn, language, line, trans=""):
+def addquote(language, line, trans=""):
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT MAX(NUM) FROM inter;")
     a = str(cur.fetchone())
@@ -207,9 +254,12 @@ def addquote(conn, language, line, trans=""):
     x = 0
     for j in rows:
         x+=1
+    cur.close()
+    conn.close()
     return "we have "+str(x) +" quotes so far"
 
-def removelast(conn):
+def removelast():
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT MAX(NUM) FROM inter;")
     a = int(str(cur.fetchone())[1:-2])
@@ -220,28 +270,37 @@ def removelast(conn):
     x = 0
     for j in rows:
         x+=1
+    cur.close()
+    conn.close()
     return "we have " + str(x) + " quotes so far"
 
-def quotenum(conn):
+def quotenum():
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT NUM, QUOT, TRAN from inter")
     rows = cur.fetchall()
     x = 0
     for j in rows:
         x += 1
+    cur.close()
+    conn.close()
     return "we have " + str(x) + " quotes so far"
 
 
 
-def setdefaults(conn):
+def setdefaults():
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT * FROM settingspref FETCH FIRST ROW ONLY;")
     a = str(cur.fetchone())
     if a == 'None':
         cur.execute("INSERT INTO settingspref VALUES (0,'/')")
     conn.commit()
+    cur.close()
+    conn.close()
 
-def setprefix(conn, val):
+def setprefix(val):
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT * FROM settingspref FETCH FIRST ROW ONLY;")
     a = str(cur.fetchone())
@@ -250,20 +309,28 @@ def setprefix(conn, val):
     else:
         cur.execute("UPDATE settingspref SET VAL = %s WHERE NMB = 0",(val, ))
     conn.commit()
+    cur.close()
+    conn.close()
 
-def getprefix(conn):
+def getprefix():
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT VAL FROM settingspref FETCH FIRST ROW ONLY;")
     a = str(cur.fetchone())
     b = a[2:-3].rstrip()
+    cur.close()
+    conn.close()
     return b
 
-def getchannel(conn, name):
+def getchannel(name):
+    conn = getconn()
     cur = conn.cursor()
     line1 = "SELECT VAL FROM " + name
     cur.execute(line1)
     a = str(cur.fetchone())
     b = a.strip(" ,()\'")
+    cur.close()
+    conn.close()
     return int(b)
 
 

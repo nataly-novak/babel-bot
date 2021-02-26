@@ -3,7 +3,7 @@ discussion = {'english': '🇬🇧', 'japanese': '🇯🇵', 'spanish': '🇪�
 quest = {"i will master": "🗡️", "reflection": "🛡️", "vow": "🗡️", "i am going to": "🗡️"}
 accountability = {"pom": "🍅", "plan": "🗓️"}
 
-from dbwork import checksetting
+from dbwork import checksetting, getconn
 
 
 def getdict(name):
@@ -26,21 +26,21 @@ def checkline(line, name):
     return emolist
 
 
-def getgroups(conn, id):
+def getgroups(id):
     groups = []
-    if checksetting(conn, 'accountability', id):
+    if checksetting('accountability', id):
         groups.append('accountability')
-    if checksetting(conn, 'quest', id):
+    if checksetting('quest', id):
         groups.append('quest')
-    if checksetting(conn, 'discussion', id):
+    if checksetting('discussion', id):
         groups.append('discussion')
     if groups == []:
         groups.append('none')
     return groups
 
 
-def getreaction(conn, message, id):
-    names = getgroups(conn, id)
+def getreaction(message, id):
+    names = getgroups(id)
     emotes = []
     for name in names:
         if name != 'none':
