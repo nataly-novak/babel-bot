@@ -94,7 +94,17 @@ def settingsdb():
     else:
         print('No need')
     conn.commit()
-
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('game',))
+    check = (cur.fetchone()[0])
+    if not check:
+        cur.execute('''CREATE TABLE game (
+                    NMB INT NOT NULL,
+                    VAL CHAR(20) NOT NULL
+                    );''')
+        print("Table created successfully")
+        cur.execute('ALTER TABLE game ADD CONSTRAINT test_pkey7 PRIMARY KEY (VAL);')
+    else:
+        print('No need')
     conn.commit()
     cur.close()
     conn.close()
