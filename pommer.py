@@ -31,14 +31,18 @@ class Pommer:
         return bomb(self.attack, defence)
 
     def heal (self, healed):
+        print(self.user, " healed ", healed)
         self.hp = min(self.hp+healed, 100)
         if self.staggered == 0:
             self.staggered = 1
         return [healed,"healed!"]
 
     def suffer(self, amount):
+        print("Amount", amount)
+        print("self.hp.before", self.hp)
         res= max(self.hp - amount, 0)
         self.hp = res
+        print("self.hp.after", self.hp)
         if res ==0:
             self.staggered = 0
             return [amount, "staggered!"]
