@@ -90,7 +90,10 @@ def checkgame():
     cur = conn.cursor()
     cur.execute("SELECT VAL FROM isgame FETCH FIRST ROW ONLY;")
     a = (cur.fetchone())
-    b = a[0]
+    if a == None:
+        b = False
+    else:
+        b = a[0]
     cur.close()
     conn.close()
     return b

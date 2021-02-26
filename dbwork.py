@@ -94,7 +94,7 @@ def settingsdb():
     else:
         print('No need')
     conn.commit()
-    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('game',))
+    cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('isgame',))
     check = (cur.fetchone()[0])
     if not check:
         cur.execute('''CREATE TABLE isgame (
