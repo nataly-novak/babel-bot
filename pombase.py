@@ -27,10 +27,10 @@ def makepombases():
                     DAMAGE INT NOT NULL, 
                     EFFECT CHAR(20) 
                     );''')
-        print("Table created successfully")
+        print("POMBASE Table created successfully")
         cur.execute('ALTER TABLE pombase ADD CONSTRAINT pom_key PRIMARY KEY (NMB);')
     else:
-        print('No need')
+        print('POMBASE No need')
     conn.commit()
     print('pommers')
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('pommers',))
@@ -48,10 +48,10 @@ def makepombases():
                     POMS CHAR(400),
                     STAGGERED INT  NOT NULL 
                     );''')
-        print("Table created successfully")
+        print("POMMERS Table created successfully")
         cur.execute('ALTER TABLE pommers ADD CONSTRAINT pommer_key PRIMARY KEY (POMMER);')
     else:
-        print('No need')
+        print('POMMERS No need')
     conn.commit()
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('isgame',))
     check = (cur.fetchone()[0])

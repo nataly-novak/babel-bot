@@ -37,6 +37,7 @@ EVENT = os.getenv('EVENT')
 
 conn = getconn()
 cur = conn.cursor()
+print("tabledropped")
 cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
 cur.close()
 conn.close()
