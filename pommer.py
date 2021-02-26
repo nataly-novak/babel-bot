@@ -32,7 +32,7 @@ class Pommer:
 
     def heal (self, healed):
         print(self.user, " healed ", healed)
-        self.hp = min(self.hp+healed, 100)
+        self.hp = min(self.hp+healed, player_hp)
         if self.staggered == 0:
             self.staggered = 1
         return [healed,"healed!"]
