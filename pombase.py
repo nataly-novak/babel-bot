@@ -1,8 +1,10 @@
 from pommer import Pommer
 from raid import Raid
+from dbwork import getconn
 emojis = {"🗡":"sword", "🛡️":"defence", "💊":"heal", "⛏":"axe", "💣":"fire","❓":"debuff"}
 
-def makepombases(conn):
+def makepombases():
+    conn = getconn()
     cur = conn.cursor()
     print('pombase')
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('pombase',))
@@ -65,10 +67,13 @@ def makepombases(conn):
     conn.commit()
     cur.execute("INSERT INTO isgame VALUES (0,%s)", ("FALSE",))
     conn.commit()
+    cur.close()
+    conn.close()
 
 
 
-def setgame(conn, val):
+def setgame( val):
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT * FROM isgame FETCH FIRST ROW ONLY;")
     a = str(cur.fetchone())
@@ -77,28 +82,38 @@ def setgame(conn, val):
     else:
         cur.execute("UPDATE isgame SET VAL = %s WHERE NMB = 0", (val,))
     conn.commit()
+    cur.close()
+    conn.close()
 
-def checkgame(conn):
+def checkgame():
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT VAL FROM isgame FETCH FIRST ROW ONLY;")
     a = (cur.fetchone())
     b = a[0]
+    cur.close()
+    conn.close()
     return b
 
-def getuserval(conn, user):
+def getuserval(user):
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT POMMER, HP, AC, DAMAGE, ATTACK, TOTAL, POMS, STAGGERED FROM pommers WHERE POMMER = %s", (str(user).ljust(50),))
     resp = (cur.fetchone())
     if resp == None:
-        return None
+        ret = None
     else:
         for i in resp:
             print(i)
-        return Pommer(resp[0].rstrip(),resp[1],resp[2],resp[3], resp[4], resp[5], resp[6].rstrip(), resp[7])
+        ret = Pommer(resp[0].rstrip(),resp[1],resp[2],resp[3], resp[4], resp[5], resp[6].rstrip(), resp[7])
+    cur.close()
+    conn.close()
+    return ret
 
 
 
-def setuserval(conn, pommer: Pommer):
+def setuserval(pommer: Pommer):
+    conn = getconn()
     cur = conn.cursor()
     print("-"+str(pommer.user).ljust(50)+"-")
     cur.execute("SELECT POMMER FROM pommers WHERE POMMER = %s", (str(pommer.user).ljust(50),))
@@ -123,9 +138,12 @@ def setuserval(conn, pommer: Pommer):
     else:
         cur.execute("UPDATE pommers SET HP= %s, AC=%s,  DAMAGE=%s, ATTACK=%s, TOTAL=%s, POMS=%s, STAGGERED = %s WHERE POMMER = %s", (str(pommer.hp), str(pommer.ac), str(pommer.damage), str(pommer.attack), str(pommer.total), str(pommer.poms), str(pommer.staggered), str(pommer.user)))
     conn.commit()
+    cur.close()
+    conn.close()
 
 
-def getraidstat(conn):
+def getraidstat():
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT MAX(NMB) FROM pombase;")
     a = str(cur.fetchone())
@@ -134,17 +152,20 @@ def getraidstat(conn):
     else:
         ar = int(a[1:-2])
     if ar == -1:
-        return Raid("",0,"")
+        ret =  Raid("",0,"")
     else:
         cur.execute("SELECT STAMP, AMNT, MMBR,ACTS,TRIGGERED, ATTACKS, BHP, VHP, BAB, AC, SAVE, DAMAGE, EFFECT  FROM pombase WHERE NMB = %s",(ar,))
         resp = (cur.fetchone())
         for i in resp:
             print(i)
-        return Raid(str(resp[0]), resp[1], resp[2].rstrip(), resp[3].rstrip(), resp[4], resp[5].rstrip, resp[6], resp[7], resp[8], resp[9], resp[10], resp[11], resp[12].rstrip() )
+        ret =  Raid(str(resp[0]), resp[1], resp[2].rstrip(), resp[3].rstrip(), resp[4], resp[5].rstrip, resp[6], resp[7], resp[8], resp[9], resp[10], resp[11], resp[12].rstrip() )
+    cur.close()
+    conn.close()
+    return ret
 
 
-
-def setraidstat(conn, raid: Raid):
+def setraidstat(raid: Raid):
+    conn = getconn()
     cur = conn.cursor()
     cur.execute("SELECT MAX(NMB) FROM pombase;")
     a = str(cur.fetchone())
@@ -154,6 +175,8 @@ def setraidstat(conn, raid: Raid):
         ar = int(a[1:-2]) + 1
     cur.execute("INSERT INTO pombase VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)",(str(ar), str(raid.stamp),str(raid.amnt),str(raid.mmbr),str(raid.acts), str(raid.trg), str(raid.attacks), str(raid.bhp), str(raid.vhp),str(raid.bab), str(raid.ac), str(raid.save), str(raid.damage), str(raid.effect)) )
     conn.commit()
+    cur.close()
+    conn.close()
 
 def getaction(emoji):
     return emojis[emoji]

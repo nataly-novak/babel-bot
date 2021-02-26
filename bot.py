@@ -17,6 +17,7 @@ from pommer import Pommer
 from stamper import line_update
 from mechanics import ranpop, roll, channeling
 from raid import  Raid
+from rules import ruleprint
 from vars import *
 
 import os
@@ -28,47 +29,28 @@ import datetime
 intents = discord.Intents.all()
 
 load_dotenv()
-STAGE = os.getenv('STAGE')
+
 TOKEN = os.getenv('TOKEN')
 ADMIN_ROLE = os.getenv('ADMIN_ROLE')
 EVENT = os.getenv('EVENT')
-if STAGE == 'dev':
-    DATABASE_URL = os.environ['DATABASE_URL']
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
-elif STAGE == 'local':
-    DATABASE_URL = os.environ['DATABASE_URL']
-    conn = psycopg2.connect(DATABASE_URL)
 
-else:
-    PSQL_HOST = os.getenv('PSQL_HOST')
-    PSQL_USER = os.getenv('PSQL_USER')
-    PSQL_DATABASE = os.getenv('PSQL_DATABASE')
-    PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
-    conn = psycopg2.connect(
-        host=PSQL_HOST,
-        user=PSQL_USER,
-        dbname=PSQL_DATABASE,
-        password=PSQL_PASSWORD
-    )
-cur = conn.cursor()
 
-cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
 
-settingsdb(conn)
-makedb(conn)
-setdefaults(conn)
-filldb(conn)
+
+
+settingsdb()
+makedb()
+setdefaults()
+filldb()
 help_items = worddicts()
-languagedb(conn)
-maketimetable(conn)
-makepombases(conn)
+languagedb()
+maketimetable()
 
 
+bot = commands.Bot(command_prefix=(getprefix()),intents=intents)
 
 
-
-bot = commands.Bot(command_prefix=(getprefix(conn)),intents=intents)
 
 bot.hug_counter = 0
 bot.hug_breaker = 0
@@ -84,9 +66,9 @@ bot.eventchan = 0
 bot.common = 0
 bot.evrole = []
 bot.keepers = 0
-bot.isgame = checkgame(conn)
+bot.isgame = checkgame()
 bot.congrats = 0
-bot.current_raid = getraidstat(conn)
+bot.current_raid = getraidstat()
 bot.current_raiders = {}
 bot.raider_actions = {}
 bot.damagers = []
@@ -103,7 +85,7 @@ async def on_ready():
             print(channel.name)
             if checkchan(channel.name):
                 print(channel.name)
-                addlanguage(conn,channel.name, channel.id)
+                addlanguage(channel.name, channel.id)
             elif channel.name == "event-announcements":
                 print(channel.id)
                 print(channel.name)
@@ -126,14 +108,38 @@ async def on_ready():
     updater.start()
 
 
-
+@bot.event
+async def on_guild_join(guild):
+    for channel in guild.text_channels:
+        print(channel.name)
+        if checkchan(channel.name):
+            print(channel.name)
+            addlanguage(channel.name, channel.id)
+        elif channel.name == "event-announcements":
+            print(channel.id)
+            print(channel.name)
+            bot.eventchan = channel.id
+        elif channel.name == "common-room":
+            print(channel.id)
+            bot.common = channel.id
+        elif channel.name == "keepers-table":
+            bot.keepers = channel.id
+    for role in guild.roles:
+        line = str(role.name)
+        print(line)
+        if line == "Events":
+            print("!!!!!")
+            print(role.name)
+            bot.evrole.append(role)
+    if bot.evrole:
+        print(bot.evrole[0].id)
 
 
 @bot.command(name='quote', help="generates random quotes with translation", pass_context=True)
 async def cookin(ctx):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
-        response = randomquote(conn)
+    if checksetting('bot', chan):
+        response = randomquote()
         await ctx.send(response)
     await ctx.message.delete()
 
@@ -141,27 +147,44 @@ async def cookin(ctx):
 @bot.command(name='add', help='Adds a quote. Use quotes around both quote and translation', pass_context=True)
 async def itl(ctx, language, line, trans=""):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
-        message = addquote(conn, language, line, trans)
+    if checksetting('bot', chan):
+        message = addquote(language, line, trans)
         await ctx.send(message)
 
 
 @bot.command(name='del', help='deletes last quote', pass_context=True)
 async def de(ctx):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
+    if checksetting('bot', chan):
         await ctx.message.delete()
-        message = removelast(conn)
+        message = removelast()
         await ctx.send(message)
 
 
-@bot.command(name='quotenumber', help='deletes last quote', pass_context=True)
+@bot.command(name='quotenumber', help='Shows the current number of quotes', pass_context=True)
 async def quotenumber(ctx):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
+    if checksetting('bot', chan):
         await ctx.message.delete()
-        message = quotenum(conn)
+        message = quotenum()
         await ctx.send(message)
+
+@bot.command(name='rules', help='Prints rules in chosen language (or english if no translation provided)', pass_context=True)
+async def rules(ctx, language):
+    await ctx.message.delete()
+    message = ruleprint(language)
+    resps = message.split(sep="\n")
+    mes = ""
+    for i in resps:
+        mes = mes +i +"\n"
+        print(i)
+        print(mes)
+        print(len(mes))
+        if len(mes) >1500:
+            await ctx.send(mes)
+            mes = ""
+    await ctx.send(mes)
+
 
 
 @bot.command(name='addfunction', help='sets the channel for function', pass_context=True)
@@ -169,7 +192,7 @@ async def quotenumber(ctx):
 async def addfunction(ctx, function):
     chan = ctx.channel.id
     print(chan)
-    addsetting(conn,function,str(chan))
+    addsetting(function,str(chan))
     await ctx.message.delete()
 
 
@@ -178,7 +201,7 @@ async def addfunction(ctx, function):
 async def delfunction(ctx, function):
     chan = ctx.channel.id
     print(chan)
-    removesetting(conn,function,str(chan))
+    removesetting(function,str(chan))
     await ctx.message.delete()
 
 
@@ -195,11 +218,12 @@ async def invite(ctx, invite = "koai"):
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
 async def raid(ctx, times = '25'):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'accountability', chan):
+    if checksetting('accountability', chan):
         if len(bot.raid_members) !=0:
             await game_process()
             bot.raid_members = []
 
+    if checksetting('accountability', chan):
         if bot.on_raid == False:
             bot.raidlen = int(times)
             message = "```WAITING FOR RAID OF " +times+  " MINUTES TO START.....```"
@@ -213,8 +237,8 @@ async def raid(ctx, times = '25'):
             await sent.add_reaction("🛡️")
             await sent.add_reaction("🗡")
             bot.raidstatus = 1
-            if getraidstat(conn):
-                bot.current_raid = getraidstat(conn)
+            if getraidstat():
+                bot.current_raid = getraidstat()
 
 
         else:
@@ -236,7 +260,7 @@ async def cancel(ctx):
 @bot.command(name='break',help='prints link to raid room',pass_context=True)
 async def breaks(ctx, times = '5'):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'accountability', chan):
+    if checksetting('accountability', chan):
         if bot.on_raid == False:
             bot.raidlen = int(times)
             message = "```WAITING FOR BREAK OF " + times + " MINUTES TO START.....```"
@@ -275,7 +299,7 @@ async def utc(ctx, date="", time="", zone=""):
 @bot.command(name="local",help="yyyy-mm-dd hh:mm timezone:Continent/City - converts UTC to your Timezone, works in bot channel", pass_context=True)
 async def local(ctx, date, time, zone):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
+    if checksetting( 'bot', chan):
         if time != "" and zone != "":
             if date == "today":
                 date = utcToday()
@@ -296,8 +320,9 @@ async def raid(ctx, theme = ""):
 @bot.command(name='setpref', help='sets a new prefix for bot',pass_context=True)
 @commands.has_role(ADMIN_ROLE)
 async def setpref(ctx, prefix):
-    setprefix(conn,prefix)
-    x = getprefix(conn)
+    setprefix(prefix)
+    getprefix()
+    x = getprefix()
     bot.command_prefix = x
     await ctx.message.delete()
     message = "Prefix is set to "+x
@@ -315,7 +340,7 @@ async def dragon(ctx, handle):
         game = "False"
         bot.isgame = False
         message = "The game was stopped"
-    setgame(conn,game)
+    setgame(game)
 
 
     await ctx.message.delete()
@@ -327,32 +352,38 @@ async def dragon(ctx, handle):
 async def addlang(ctx, language):
     chan = ctx.channel.id
     print(chan)
-    addlanguage(conn,language,chan)
+    addlanguage(language,chan)
     await ctx.message.delete()
 
 
 @bot.command(name='flip', help='flips a coin',pass_context=True)
 async def flip(ctx):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
+    if checksetting('bot', chan):
         await ctx.send(coin())
 
 
-@bot.command(name='rand', help='flips a coin',pass_context=True)
+@bot.command(name='rand', help='gives several random numbers in a range. First number is range, second is the number of winners',pass_context=True)
 async def ran(ctx, number, amount = 1):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
+    if checksetting( 'bot', chan):
         await ctx.send(rannum(int(number),int(amount)))
 
 @bot.command(name = 'inquire', help="Works from dm only, allows you to message keepers, put the message into quotes",pass_context=True)
 async def inquire(ctx, message):
-    if not ctx.guild:
-        sender = ctx.author.mention
-        keep = bot.get_channel(bot.keepers)
-        await keep.send(sender+" "+message)
-        await ctx.send("Thank you! The Keepers will read your message as soon as possible and contact you if necessary")
-    else:
-        await ctx.send("This is a DM-only command")
+    is_member = False
+    for guild in bot.guilds:
+        if guild.get_member(ctx.author.id):
+            print("incoming from member")
+            is_member = True
+    if is_member:
+        if not ctx.guild:
+            sender = ctx.author.mention
+            keep = bot.get_channel(bot.keepers)
+            await keep.send(sender+" "+message)
+            await ctx.send("Thank you! The Keepers will read your message as soon as possible and contact you if necessary")
+        else:
+            await ctx.send("This is a DM-only command")
 
 
 
@@ -360,13 +391,13 @@ async def inquire(ctx, message):
 @bot.event
 async def on_raw_reaction_add(payload):
     chan = payload.channel_id
-    print(checksetting(conn,'accountability', chan))
-    if checksetting(conn,'accountability', chan):
+    print(checksetting('accountability', chan))
+    if checksetting('accountability', chan):
         if payload.emoji.name == "📌":
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.pin()
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
-            bot.current_raid = getraidstat(conn)
+            bot.current_raid = getraidstat()
             print("it's alive")
             looper.start()
             bot.raidstatus = 2
@@ -383,8 +414,8 @@ async def on_raw_reaction_add(payload):
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛡️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
-            if getuserval(conn,payload.member.id):
-                bot.current_raiders[str(payload.member.id)]=(getuserval(conn, payload.member.id))
+            if getuserval(payload.member.id):
+                bot.current_raiders[str(payload.member.id)]=(getuserval(payload.member.id))
                 print("exist")
             else:
                 bot.current_raiders[str(payload.member.id)]=(Pommer(str(payload.member.id)))
@@ -433,7 +464,7 @@ async def on_raw_reaction_add(payload):
 @bot.command(name="myhp", help ="shows your current hp", pass_context = True)
 async def myhp(ctx):
     player = (ctx.author.id)
-    raider = getuserval(conn,player)
+    raider = getuserval(player)
     print(raider.hp)
     message = "Your hp is " + str(raider.hp)
     await ctx.send(message)
@@ -445,7 +476,7 @@ async def myhp(ctx):
 @bot.event
 async def on_raw_reaction_remove(payload):
     chan = payload.channel_id
-    if checksetting(conn,'accountability', chan):
+    if checksetting('accountability', chan):
         if payload.emoji.name == "📌":
             print("emoji_removed")
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
@@ -476,8 +507,8 @@ async def on_message(message):
     hug = get(bot.emojis, name='BlobHug')
     chan = message.channel.id
     line = message.content
-    print(getreaction(conn,line,chan))
-    emo = getreaction(conn,line,chan)
+    print(getreaction(line,chan))
+    emo = getreaction(line,chan)
     for i in emo:
         print(i)
         if i[:1] == ':':
@@ -487,7 +518,7 @@ async def on_message(message):
                 await message.add_reaction(emoji)
         else:
             await message.add_reaction(i)
-    if checksetting(conn, "discussion", chan):
+    if checksetting( "discussion", chan):
         if ":BlobHug:" in line:
             bot.hug_counter += 1
             bot.hug_breaker = 0
@@ -508,7 +539,7 @@ async def on_member_update(before, after):
     if len(before.roles) < len(after.roles):
         newRole = next(role for role in after.roles if role not in before.roles)
         if checkrole(newRole.name):
-            chan = (roletochan(conn,newRole.name))
+            chan = (roletochan(newRole.name))
             print(chan)
             if chan != -1:
                 channel = bot.get_channel(chan)
@@ -600,21 +631,23 @@ async def raid_done():
 @commands.has_any_role(ADMIN_ROLE, EVENT)
 async def event(ctx, day="", time="", channel="", name=""):
     if day != "" and time != "" and channel != "" and name !="":
-        num = addevent(conn,day, time, channel, name)
+        num = addevent(day, time, channel, name)
         await ctx.send("Your event ticket is " + str(num) + ", please keep it for the case of canceling it")
     elif day == "" and time == "" and channel == "" and name =="":
-        ev = geteventlist(conn)
+        ev = geteventlist()
         message = ""
         for i in ev:
             line = str(i[0])+": "+str(i[1])+" "+str(i[2]).rsplit(sep=':',maxsplit=1)[0]+" "+ str(i[3]) + " "+i[4]+"\n"
             message += line
+        if message =="":
+            message = "Empty schedule"
         await ctx.send(message)
 
 
 @bot.command(name = "delevent", help = "Deletes an event",pass_context=True)
 @commands.has_any_role(ADMIN_ROLE, EVENT)
 async def delevent(ctx, ticket):
-    remevent(conn, int(ticket))
+    remevent(int(ticket))
     await ctx.send("Ticket "+ticket+" was removed")
 
 
@@ -622,8 +655,8 @@ async def delevent(ctx, ticket):
 @bot.command(name = "schedule", help = "Show events converted to your timezone", pass_context = True)
 async def schedule(ctx, zone = "UTC"):
     chan = ctx.message.channel.id
-    if checksetting(conn, 'bot', chan):
-        ev = convertlist(conn, geteventlist(conn),zone)
+    if checksetting( 'bot', chan):
+        ev = convertlist( geteventlist(),zone)
         message = ""
         today = getToday(zone)
         toddate = datetime.datetime.strptime(today,"%Y-%m-%d")
@@ -634,7 +667,7 @@ async def schedule(ctx, zone = "UTC"):
         print(date_list)
         for i in ev:
             print(i)
-            if i[1] in date_list and  i[2].hour > datetime.datetime.utcnow().time().hour or (i[2].hour == datetime.datetime.utcnow().time().hour and i[2].minute >= datetime.datetime.utcnow().time().minute):
+            if i[1] in date_list and  (i[2].hour > datetime.datetime.utcnow().time().hour or (i[2].hour == datetime.datetime.utcnow().time().hour and i[2].minute >= datetime.datetime.utcnow().time().minute) or i[1] != date_list[0]):
                 if i[3] != -1:
                     channel = bot.get_channel(i[3])
                 else:
@@ -655,7 +688,7 @@ async def updater():
         print(bot.get_channel(bot.common).name)
         announcements = bot.get_channel(bot.eventchan)
         message = ""
-        ev = convertlist(conn, geteventlist(conn), 'UTC')
+        ev = convertlist(geteventlist(), 'UTC')
         today = getToday('UTC')
         toddate = datetime.datetime.strptime(today, "%Y-%m-%d")
         stamp_list = [toddate + datetime.timedelta(days=x) for x in range(3)]
@@ -673,7 +706,7 @@ async def updater():
                 line = "📖 "+ str(i[1]) + " " + str(i[2]).rsplit(sep=':', maxsplit=1)[0] + " UTC " + channel.mention + " " + i[4] + "\n"
                 message += line
             elif i[1]<toddate.date():
-                remevent(conn,i[0])
+                remevent(i[0])
         print(message)
         if message != "":
             if bot.evrole :
@@ -829,7 +862,7 @@ async def game_process():
                 message = message + "The dragon uses it's breath on the village and deals " + str(res[0]) + " damage. " + str(bot.current_raid.vhp) + " hp remains\n"
             for i in bot.current_raiders:
                 bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered + 2)
-                setuserval(conn, bot.current_raiders[i])
+                setuserval( bot.current_raiders[i])
         else:
             message = message + "Something went wrong\n"
     else:
@@ -849,12 +882,12 @@ async def game_process():
 
 
     print(str(bot.current_raid))
-    setraidstat(conn, bot.current_raid)
+    setraidstat( bot.current_raid)
     bot.raidstatus = 0
     bot.raider_actions = {}
     bot.current_raiders = {}
     bot.damagers = []
-    protocol = bot.get_channel(getchannel(conn, "game"))
+    protocol = bot.get_channel(getchannel("game"))
     await protocol.send(message)
     bot.debuf_counter = 0
 
