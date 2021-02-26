@@ -1,7 +1,7 @@
 from pommer import Pommer
 from raid import Raid
 from dbwork import getconn
-emojis = {"🗡":"sword", "🛡️":"defence", "💊":"heal", "⛏":"axe", "💣":"fire","❓":"debuff"}
+emojis = {"🗡":"sword", "🛡️":"defence", "💊":"heal", "🪓":"axe", "💣":"bomb","❓":"debuff"}
 
 def makepombases():
     conn = getconn()

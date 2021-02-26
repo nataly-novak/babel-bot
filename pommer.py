@@ -58,7 +58,7 @@ class Pommer:
             return self.sword(target, additional)
         elif name == "axe":
             return self.axe(target, additional)
-        elif name == "fire":
+        elif name == "bomb":
             return self.fire(target)
         elif name == "defence":
             return self.shield(target)

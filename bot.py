@@ -432,7 +432,7 @@ async def on_raw_reaction_add(payload):
             await raider.edit(content=remain)
         elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🛏️" and payload.member.bot == False:
             bot.raid_members.append(payload.member.id)
-        elif payload.message_id == bot.congrats and bot.raidstatus == 4 and payload.emoji.name in ["🗡", "🛡️", "💊", "⛏", "💣","❓"] and payload.member.bot == False:
+        elif payload.message_id == bot.congrats and bot.raidstatus == 4 and payload.emoji.name in ["🗡", "🛡️", "💊", "🪓", "💣","❓"] and payload.member.bot == False:
             if payload.emoji.name != "❓" or bot.debuf_counter == 0:
                 player = payload.member.id
                 bot.raid_members.remove(player)
@@ -762,7 +762,7 @@ async def game_process():
                 name = user.name
             if bot.current_raiders[i].staggered == 2:
                 command = getaction(bot.raider_actions[i])
-                if command in ["sword", "axe", "fire"]:
+                if command in ["sword", "axe", "bomb"]:
                     add = len(selector) - 1
                     result = bot.current_raiders[i].action(command, bot.current_raid.ac, add)
                     print(result, " RESULT")
