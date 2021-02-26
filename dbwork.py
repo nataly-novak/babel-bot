@@ -97,7 +97,7 @@ def settingsdb():
     cur.execute('select exists(select * from information_schema.tables where table_name=%s)', ('game',))
     check = (cur.fetchone()[0])
     if not check:
-        cur.execute('''CREATE TABLE game (
+        cur.execute('''CREATE TABLE isgame (
                     NMB INT NOT NULL,
                     VAL CHAR(20) NOT NULL
                     );''')
