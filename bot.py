@@ -398,7 +398,7 @@ async def on_raw_reaction_add(payload):
         if payload.emoji.name == "📌":
             msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
             await msg.pin()
-        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False:
+        elif payload.message_id == bot.raid_id and bot.raidstatus == 1 and payload.emoji.name == "🗡" and payload.member.bot == False and payload.member.id in bot.raid_members:
             bot.current_raid = getraidstat()
             print("it's alive")
             looper.start()
@@ -496,6 +496,7 @@ async def on_raw_reaction_remove(payload):
             for i in bot.raid_members:
                 if i not in raiders:
                     bot.raid_members.remove(i)
+                    bot.current_raiders.pop(i, None)
 
             if bot.raid_members == []:
                 print(bot.raid_members)
@@ -731,7 +732,11 @@ async def game_process():
     selector = []
 
     if bot.current_raid.effect != "":
-        bot.current_raid.effect !=""
+        bot.current_raid.effect = ""
+    bot.current_raid.bhp = dragon_hp
+    bot.current_raid.bab = dragon_bab
+    bot.current_raid.damage = dragon_damage
+    bot.current_raid.ac = dragon_ac
     for i in bot.current_raiders:
         bot.current_raiders[i].ac = 15
         selector.append(bot.current_raiders[i].user)
