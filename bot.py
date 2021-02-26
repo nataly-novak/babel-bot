@@ -37,7 +37,7 @@ EVENT = os.getenv('EVENT')
 
 conn = getconn()
 cur = conn.cursor()
-#cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
+cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
 cur.close()
 conn.close()
 
@@ -733,7 +733,6 @@ async def game_process():
 
     if bot.current_raid.effect != "":
         bot.current_raid.effect = ""
-    bot.current_raid.bhp = dragon_hp
     bot.current_raid.bab = dragon_bab
     bot.current_raid.damage = dragon_damage
     bot.current_raid.ac = dragon_ac

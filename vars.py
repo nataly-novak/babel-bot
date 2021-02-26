@@ -1,4 +1,4 @@
-player_hp = 100
+player_hp = 50
 player_ac = 15
 player_bab = 10
 pommer_damage = 4
