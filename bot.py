@@ -810,6 +810,7 @@ async def game_process():
             else:
                 name = user.name
             bot.damagers.append([0, bot.current_raiders[i].user])
+            bot.current_raiders[i].staggered = 1
             message = message + name + " seems to be staggered and can't do anything\n"
     useless = 0
     destruction = False
