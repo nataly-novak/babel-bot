@@ -559,7 +559,7 @@ async def raid_done():
                 await sent.add_reaction("🛡️")
                 await sent.add_reaction("💊")
                 if len(bot.raid_members)>2:
-                    await sent.add_reaction("⛏")
+                    await sent.add_reaction("🪓")
                 if len(bot.raid_members)>4:
                     await sent.add_reaction("💣")
                 if len(bot.raid_members)>6:
