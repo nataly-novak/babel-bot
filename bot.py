@@ -470,8 +470,11 @@ async def myhp(ctx):
     player = (ctx.author.id)
     print(player)
     raider = getuserval(player)
-    print(raider.hp)
-    message = ctx.author.mention+", Your hp is " + str(raider.hp)
+    if raider != None:
+        hp = (raider.hp)
+    else:
+        hp = player_hp
+    message = ctx.author.mention+", Your hp is " + str(hp)
     await ctx.send(message)
 
 
