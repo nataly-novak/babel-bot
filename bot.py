@@ -742,6 +742,8 @@ async def game_process():
     bot.current_raid.damage = dragon_damage
     bot.current_raid.ac = dragon_ac
     for i in bot.current_raiders:
+        if bot.current_raiders[i].hp > player_hp:
+            bot.current_raiders[i].hp = player_hp
         bot.current_raiders[i].ac = 15
         selector.append(bot.current_raiders[i].user)
         print("RAIDER",bot.current_raiders[i].user)
