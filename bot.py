@@ -5,16 +5,16 @@ from discord.ext import commands, tasks
 import discord
 from dotenv import load_dotenv
 from dbwork import makedb, filldb, randomquote, removelast, addquote, settingsdb, addsetting, removesetting, checksetting, \
-    setprefix, setdefaults, getprefix, quotenum, getchannel, getconn
+    setprefix, setdefaults, getprefix, quotenum, getchannel
 from wordlists import getreaction, worddicts, help
 from discord.utils import get
 from timework import toUTC, currentUTC, toLocal, getToday, utcToday
 from languages import checkrole, roletochan, addlanguage, languagedb, checkchan
 from randomer import coin, rannum
 from scheduler import maketimetable, addevent, geteventlist, convertlist, remevent
-from pombase import makepombases, checkgame, setgame, setuserval,getuserval, setraidstat, getraidstat, getaction
+from pombase import makepombases, checkgame, setgame, setuserval,getuserval, setraidstat, getraidstat, getaction, cleanbases, dropbase, getwinners
 from pommer import Pommer
-from stamper import line_update
+from stamper import line_update, stamp_list
 from mechanics import ranpop, roll, channeling
 from raid import  Raid
 from rules import ruleprint
@@ -35,13 +35,8 @@ ADMIN_ROLE = os.getenv('ADMIN_ROLE')
 EVENT = os.getenv('EVENT')
 
 
-conn = getconn()
-cur = conn.cursor()
-print("tabledropped")
-#cur.execute("DROP TABLE IF EXISTS pommers, pombase  ")
-cur.close()
-conn.close()
 
+dropbase()
 settingsdb()
 makedb()
 setdefaults()
@@ -50,6 +45,7 @@ help_items = worddicts()
 languagedb()
 maketimetable()
 makepombases()
+cleanbases()
 
 
 bot = commands.Bot(command_prefix=(getprefix()),intents=intents)
@@ -221,34 +217,41 @@ async def invite(ctx, invite = "koai"):
 
 @bot.command(name='raid',help='prints link to raid room',pass_context=True)
 async def raid(ctx, times = '25'):
-    chan = ctx.message.channel.id
-
-
-    if checksetting('accountability', chan):
-        if bot.on_raid == False:
-            if len(bot.raid_members) != 0:
-                await game_process()
-                bot.raid_members = []
-            bot.raidlen = int(times)
-            message = "```WAITING FOR RAID OF " +times+  " MINUTES TO START.....```"
-            sent = await ctx.send(message)
-            bot.account_id = ctx.message.channel.id
-            await ctx.message.delete()
-            bot.raid_id = sent.id
-            await sent.pin()
-            bot.on_raid = True
-            bot.raidbreak = True
-            await sent.add_reaction("🛡️")
-            await sent.add_reaction("🗡")
-            bot.raidstatus = 1
-            if getraidstat():
-                bot.current_raid = getraidstat()
-
-
+    if times.isdecimal():
+        if int(times) <= 50:
+            chan = ctx.message.channel.id
+            if checksetting('accountability', chan):
+                if bot.on_raid == False:
+                    if checkgame():
+                        if len(bot.raid_members) != 0:
+                            await game_process()
+                            bot.raid_members = []
+                    bot.raidlen = int(times)
+                    message = "```WAITING FOR RAID OF " +times+  " MINUTES TO START.....\n To join the raid, click shield emoji. \n When everyone is ready, someone should click sword emoji to start the timer\n This message will be updated as a timer. \n You will see the timer in the pinned message```"
+                    sent = await ctx.send(message)
+                    bot.account_id = ctx.message.channel.id
+                    await ctx.message.delete()
+                    bot.raid_id = sent.id
+                    await sent.pin()
+                    bot.on_raid = True
+                    bot.raidbreak = True
+                    await sent.add_reaction("🛡️")
+                    await sent.add_reaction("🗡")
+                    bot.raidstatus = 1
+                    if getraidstat():
+                        bot.current_raid = getraidstat()
+                else:
+                    message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
+                    await ctx.send(message)
+                    await ctx.message.delete()
         else:
-            message = "TIMER IS ALREADY ON, SEE PINNED MESSAGES"
-            await ctx.send(message)
-            await ctx.message.delete()
+            await ctx.send("The time is too long. It is highly advised to do focused work in a reasonable durations of time, please enter the shorter duration")
+    else:
+        await ctx.send("I am sorry, but your input is unreadable. You can type ;raid without parameters for a standard one.")
+
+
+
+
 
 
 @bot.command(name='cancel', help='cancels raid',pass_context = True)
@@ -465,18 +468,46 @@ async def on_raw_reaction_add(payload):
 
 
 
-@bot.command(name="myhp", help ="shows your current hp", pass_context = True)
-async def myhp(ctx):
+@bot.command(name="mystat", help ="shows your current hp, defence and status", pass_context = True)
+async def mystat(ctx):
     player = (ctx.author.id)
     print(player)
     raider = getuserval(player)
     if raider != None:
         hp = (raider.hp)
+        ac = raider.ac
+        if raider.staggered == 2:
+            if len(stamp_list(raider.poms))<17:
+                stagger = ", You can act freely "
+            else:
+                stagger = ", You are too tired to act"
+        else:
+            stagger = ", You cannot act, though you can still receive heals and defences"
     else:
         hp = player_hp
-    message = ctx.author.mention+", Your hp is " + str(hp)
+        ac = player_ac
+        stagger = ", You can act freely "
+    message = ctx.author.mention+", Your hp is " + str(hp)+", Your defence is "+ str(ac) + stagger
     await ctx.send(message)
 
+
+@bot.command(name='showleaders', help='shows current event leaders',pass_context=True)
+@commands.has_role(ADMIN_ROLE)
+async def showleaders(ctx):
+    message = ""
+    nominations = ["Total Poms", "Best Healer", "Best Damage", "Best Defender"]
+    lst = getwinners()
+    for i in range(len(lst)):
+        message = message+nominations[i]+":\n"
+        for j in lst[i]:
+            memb = bot.guild.get_member(int(j[0].rstrip()))
+            if memb.nick:
+                name = memb.nick
+            else:
+                name = memb.name
+            message = message + name + ": "+ str(j[1])+"\n"
+        message= message+"------------------\n"
+    await ctx.send("```"+message+'```')
 
 
 
@@ -501,7 +532,10 @@ async def on_raw_reaction_remove(payload):
             for i in bot.raid_members:
                 if i not in raiders:
                     bot.raid_members.remove(i)
-                    bot.current_raiders.pop(i, None)
+                    bot.current_raiders.pop(str(i), None)
+
+            for i in bot.current_raiders:
+                print(i)
 
             if bot.raid_members == []:
                 print(bot.raid_members)
@@ -516,7 +550,6 @@ async def on_message(message):
     hug = get(bot.emojis, name='BlobHug')
     chan = message.channel.id
     line = message.content
-    print(getreaction(line,chan))
     emo = getreaction(line,chan)
     for i in emo:
         print(i)
@@ -593,6 +626,13 @@ async def raid_done():
                 name = member.mention
                 message = message + name +", "
             message = message[:-2]+"!"
+            message = message+ "\n`Sword emoji is for attack, Shield emoji defends some ot the raid members, Pill emoji heals the raid.`\n"
+            if len(bot.raid_members) > 2:  # should be 2
+                message = message +"`Axe emoji gives you a stronger attack`\n"
+            if len(bot.raid_members) > 6:  # should be 2
+                message = message +"`Bomb emoji gives you a stronger attack that hits more often`\n"
+            if len(bot.raid_members) > 2:  # should be 2
+                message = message +"`Question mark emoji launches a mystery attack that weakens the dragon in some way`\n"
             sent = await channel.send(message)
             if bot.isgame:
                 await sent.add_reaction("🗡")
@@ -651,6 +691,7 @@ async def event(ctx, day="", time="", channel="", name=""):
         if message =="":
             message = "Empty schedule"
         await ctx.send(message)
+
 
 
 @bot.command(name = "delevent", help = "Deletes an event",pass_context=True)
@@ -755,14 +796,27 @@ async def game_process():
         if i in bot.raider_actions:
             if bot.current_raiders[i].staggered == 2:
                 command = getaction(bot.raider_actions[i])
-                if command == "debuff":
+                if len(stamp_list(bot.current_raiders[i].poms))<17:
+                    if command == "debuff":
+                        user = bot.guild.get_member(int(bot.current_raiders[i].user))
+                        if user.nick:
+                            name = user.nick
+                        else:
+                            name = user.name
+                        message = message + name + " uses the mysterious attack!"+bot.current_raid.mystery()
+                        bot.damagers.append([20, bot.current_raiders[i].user])
+                        print("BOT DAMAGERS", bot.damagers)
+                else:
                     user = bot.guild.get_member(int(bot.current_raiders[i].user))
                     if user.nick:
                         name = user.nick
                     else:
                         name = user.name
-                    message = message + name + " uses the mysterious attack!"+bot.current_raid.mystery()
-                    bot.damagers.append([20, bot.current_raiders[i].user])
+                    message = message+ name + " worked too much and is too tired to do anything"
+                    bot.damagers.append([0, bot.current_raiders[i].user])
+                    bot.raider_actions[i] = "❓"
+                    if bot.current_raiders[i].staggered == 2:
+                        bot.current_raiders[i].staggered = 0
 
     for i in bot.current_raiders:
         if i in bot.raider_actions:
@@ -771,40 +825,63 @@ async def game_process():
                 name = user.nick
             else:
                 name = user.name
+            today_raids = len(stamp_list(bot.current_raiders[i].poms))
+            if today_raids < 5:
+                multiplier = 1
+            else:
+                multiplier = (13-(today_raids-4))/13
+            if today_raids < 9:
+                heal_multiplier = 1
+            else:
+                heal_multiplier = (9-(today_raids-4))/9
+
             if bot.current_raiders[i].staggered == 2:
                 command = getaction(bot.raider_actions[i])
                 if command in ["sword", "axe", "bomb"]:
                     add = len(selector) - 1
                     result = bot.current_raiders[i].action(command, bot.current_raid.ac, add)
                     print(result, " RESULT")
+                    if result[0] != 0:
+                        result[0] = max(int(result[0]*multiplier),1)
+                    print(result, " RESULT")
                     damage += result[0]
+                    bot.current_raiders[i].dealed+= result[0]
                     bot.damagers.append([result[0], bot.current_raiders[i].user])
-                    message = message + name + " uses " + command + ". It's a " + result[1] + " with " + str(
-                        result[0]) + " damage\n"
+                    print("BOT DAMAGERS",bot.damagers)
+                    message = message + name + " uses " + command + ". It's a " + result[1] + " with " + str(result[0]) + " damage\n"
                 elif command == "defence":
+                    if today_raids <9:
+                        defval = 2
+                    else:
+                        defval = 1
+                    bot.current_raiders[i].done +=defval
                     ln = len(bot.current_raiders)
                     nm = min(max_shields, max(ln // 3, 1))
                     lst = ranpop(nm, ln)
-                    print("LST: ", lst)
+                    print("LST: ", ln, nm, lst)
+                    lst = ranpop(nm, ln)
                     defs = ""
                     for j in lst:
                         print("I: ", j)
-                        bot.current_raiders[selector[j]].action("defence", 1)
+                        bot.current_raiders[selector[j]].action("defence", defval)
                         defended = bot.guild.get_member(int(selector[j]))
                         if defended.nick:
-                            def_name = user.nick
+                            def_name = defended.nick
                         else:
-                            def_name = user.name
+                            def_name = defended.name
                         defs = defs + def_name + ", "
-                    bot.damagers.append([0, bot.current_raiders[i].user])
-                    message = message + name + " uses " + command + " to defend " + defs + " it increases their defence by 1\n"
+                    bot.damagers.append([3, bot.current_raiders[i].user])
+                    print("BOT DAMAGERS", bot.damagers)
+                    message = message + name + " uses " + command + " to defend " + defs + " it increases their defence by "+str(defval)+"\n"
 
                 elif command == "heal":
-                    healamount = channeling()
+                    healamount = max(int(channeling()*heal_multiplier),1)
+                    bot.current_raiders[i].healed +=healamount
                     for j in bot.current_raiders:
                         bot.current_raiders[j].action("heal", healamount)
                     message = message + name + " uses " + command + " to heal " + str(healamount) + " hp to everyone!\n"
-                    bot.damagers.append([0, bot.current_raiders[i].user])
+                    bot.damagers.append([healamount, bot.current_raiders[i].user])
+                    print("BOT DAMAGERS", bot.damagers)
                 print(str(bot.current_raiders[i]))
             else:
                 bot.damagers.append([0, bot.current_raiders[i].user])
@@ -821,7 +898,10 @@ async def game_process():
     useless = 0
     destruction = False
     if bot.current_raid.effect != "stagger":
+        print("------\nTHE DRAGON ATTACKS\n-----")
         if len(bot.damagers) >0:
+            print("------\nDAMAGERS NOT NULLn-----")
+            print("BOT DAMAGERS", bot.damagers)
             for i in bot.current_raiders:
                 if bot.current_raiders[i].staggered < 2:
                     useless += 1
@@ -831,10 +911,18 @@ async def game_process():
                 print("TRUUUUU")
             if not destruction:
                 if bot.current_raid.trg > 0:
-                        n = max(1, len(bot.damagers) // 2)
-                        amnt = roll(n)
-                        atk = ranpop(amnt, n)
+                        if len(bot.damagers) > 1:
+                            n = roll(len(bot.damagers) //2)
+                            if n//2<1:
+                                atk = [0]
+                            else:
+                                thres = n//2-1
+                                add = roll(n - thres)
+                                atk = ranpop(add+thres, n)
+                        else:
+                            atk = [0]
                         print(atk)
+                        bot.damagers.sort(reverse=True)
                         for i in atk:
                             damaged = bot.current_raiders[bot.damagers[i][1]]
                             defended = bot.guild.get_member(int(damaged.user))
@@ -868,9 +956,9 @@ async def game_process():
                             print("Evaded", i)
                             defended = bot.guild.get_member(int(bot.current_raiders[i].user))
                             if defended.nick:
-                                def_name = user.nick
+                                def_name = defended.nick
                             else:
-                                def_name = user.name
+                                def_name = defended.name
                             message = message + def_name + " evaded the dragon's fire!\n"
                         bot.current_raid.trg = roll(breath_roll) + breath_cooldown
             else:

@@ -1,9 +1,9 @@
 player_hp = 50
 player_ac = 15
-player_bab = 10
+player_bab = 7
 pommer_damage = 4
 dragon_ac = 15
-dragon_bab = 10
+dragon_bab = 9
 dragon_damage = 7
 dragon_hp = 666
 village_hp = 500

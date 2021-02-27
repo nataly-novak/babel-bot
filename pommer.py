@@ -2,7 +2,7 @@ from mechanics import attack, bomb, channeling
 from vars import *
 
 class Pommer:
-    def __init__(self, user, hp = player_hp, ac = player_ac , damage = pommer_damage, attack = player_bab, total = 0, poms = "", staggered = 2):
+    def __init__(self, user, hp = player_hp, ac = player_ac , damage = pommer_damage, attack = player_bab, total = 0, poms = "", staggered = 2, healed = 0, dealed = 0, done = 0):
         self.user = user
         self.hp = hp
         self.ac = ac
@@ -11,10 +11,14 @@ class Pommer:
         self.total = total
         self.poms = poms
         self.staggered = staggered
+        self.healed = healed
+        self.dealed = dealed
+        self.done = done
 
     def __str__(self):
         ln = "USER: " + str(self.user)+ ", HP:" + str(self.hp) + ", AC: " +str(self.ac)+", DAMAGE: "+ str(self.damage)+", ATTACK: "+ str(self.attack)+ ", STAGGERED: "+str(self.staggered)
-        return ln
+        qual = "\nPOMS: "+str(self.total)+ ", Damage: "+str(self.dealed) +", Heals: "+str(self.healed)+", Defences: "+str(self.done)
+        return ln+qual
 
 
     def shield(self, bonus):
