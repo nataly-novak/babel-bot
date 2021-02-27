@@ -36,7 +36,7 @@ EVENT = os.getenv('EVENT')
 
 
 
-dropbase()
+#dropbase()
 settingsdb()
 makedb()
 setdefaults()
@@ -45,7 +45,7 @@ help_items = worddicts()
 languagedb()
 maketimetable()
 makepombases()
-cleanbases()
+#cleanbases()
 
 
 bot = commands.Bot(command_prefix=(getprefix()),intents=intents)
