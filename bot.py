@@ -466,6 +466,13 @@ async def on_raw_reaction_add(payload):
 
 
 
+@bot.command(name='addlore', help='Adds a quote. Use quotes around both quote and translation', pass_context=True)
+@commands.has_role(ADMIN_ROLE)
+async def addlor(ctx, action, language, line, trans=""):
+    chan = ctx.message.channel.id
+    if checksetting('bot', chan):
+        message = addlore(action, language, line, trans)
+        await ctx.send(message)
 
 
 
