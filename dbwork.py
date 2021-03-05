@@ -152,6 +152,9 @@ def filldb():
     rows = cur.fetchall()
     n = len(f1)
     f.close()
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def addsetting(setting, value):
     conn = getconn()

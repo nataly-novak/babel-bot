@@ -27,11 +27,11 @@ def attack(BAB, weapon_die, weapon_damage, multiplier, AC):
             rolls =0
             for i in range(multiplier):
                 rolls += roll(weapon_die)
-            return [rolls+multiplier*weapon_damage, "Critical Hit!"]
+            return [rolls+multiplier*weapon_damage, "critical hit"]
         else:
-            return [roll(weapon_die)+weapon_damage, "Hit"]
+            return [roll(weapon_die)+weapon_damage, "hit"]
     else:
-        return [0, "Miss"]
+        return [0, "miss"]
 
 def bomb(BAB, AC, amnt = 3, damage = 4):
     crit = False

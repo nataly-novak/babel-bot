@@ -16,6 +16,7 @@ from pombase import makepombases, checkgame, setgame, setuserval,getuserval, set
 from pommer import Pommer
 from stamper import line_update, stamp_list
 from mechanics import ranpop, roll, channeling
+from lore import makelore, filllore, getlore, addlore
 from raid import  Raid
 from rules import ruleprint
 from vars import *
@@ -45,6 +46,8 @@ help_items = worddicts()
 languagedb()
 maketimetable()
 makepombases()
+makelore()
+filllore()
 #cleanbases()
 
 
@@ -486,7 +489,10 @@ async def mystat(ctx):
     else:
         hp = player_hp
         ac = player_ac
-        stagger = ", You can act freely "
+        if hp > 0:
+            stagger = ", You can act freely "
+        else:
+            stagger = ", You are wounded and cannot act, but you can still receive heals and defences"
     message = ctx.author.mention+", Your hp is " + str(hp)+", Your defence is "+ str(ac) + stagger
     await ctx.send(message)
 
@@ -803,7 +809,9 @@ async def game_process():
                             name = user.nick
                         else:
                             name = user.name
-                        message = message + name + " uses the mysterious attack!"+bot.current_raid.mystery()
+                        mystery = bot.current_raid.mystery()
+                        message = message +getlore(bot.current_raid.effect)
+                        message = message + name + " uses the mysterious attack! "+ mystery
                         bot.damagers.append([20, bot.current_raiders[i].user])
                         print("BOT DAMAGERS", bot.damagers)
                 else:
@@ -838,16 +846,32 @@ async def game_process():
             if bot.current_raiders[i].staggered == 2:
                 command = getaction(bot.raider_actions[i])
                 if command in ["sword", "axe", "bomb"]:
+                    mult = 1
+                    if bot.current_raid.effect == "vulnerable":
+                        mult = 1.5
                     add = len(selector) - 1
                     result = bot.current_raiders[i].action(command, bot.current_raid.ac, add)
                     print(result, " RESULT")
                     if result[0] != 0:
-                        result[0] = max(int(result[0]*multiplier),1)
+                        result[0] = max(int(result[0]*multiplier*mult),1)
                     print(result, " RESULT")
                     damage += result[0]
                     bot.current_raiders[i].dealed+= result[0]
                     bot.damagers.append([result[0], bot.current_raiders[i].user])
                     print("BOT DAMAGERS",bot.damagers)
+                    if command != "bomb":
+                        if result[1] == "miss":
+                            message = message + getlore("miss")
+                        elif result[1] == "critical hit":
+                            message = message  + getlore("crit")
+                        else:
+                            message = message + getlore(command)
+                    else:
+                        if result[1] == "miss":
+                            message = message + getlore("bmiss")
+                        else:
+                            message = message  + getlore("bomb")
+
                     message = message + name + " uses " + command + ". It's a " + result[1] + " with " + str(result[0]) + " damage\n"
                 elif command == "defence":
                     if today_raids <9:
@@ -872,6 +896,7 @@ async def game_process():
                         defs = defs + def_name + ", "
                     bot.damagers.append([3, bot.current_raiders[i].user])
                     print("BOT DAMAGERS", bot.damagers)
+                    message = message + getlore("shield")
                     message = message + name + " uses " + command + " to defend " + defs + " it increases their defence by "+str(defval)+"\n"
 
                 elif command == "heal":
@@ -879,6 +904,7 @@ async def game_process():
                     bot.current_raiders[i].healed +=healamount
                     for j in bot.current_raiders:
                         bot.current_raiders[j].action("heal", healamount)
+                    message = message + getlore("heal")
                     message = message + name + " uses " + command + " to heal " + str(healamount) + " hp to everyone!\n"
                     bot.damagers.append([healamount, bot.current_raiders[i].user])
                     print("BOT DAMAGERS", bot.damagers)
@@ -934,6 +960,10 @@ async def game_process():
                             res = bot.current_raiders[bot.damagers[i][1]].suffer(dam[0])
                             print("RESULT ", res)
                             print(str(bot.current_raiders[bot.damagers[i][1]]))
+                            if dam[1] == "miss":
+                                message = message + getlore("dmiss")
+                            else:
+                                message = message + getlore("dragon")
                             message = message + "Dragon attacks " + def_name + "! It's a " + dam[1] + " with " + str(
                                 dam[0]) + " damage!\n"
                         bot.current_raid.trg -= 1
@@ -941,6 +971,7 @@ async def game_process():
                     message = message + "Dragon uses it's breath!\n"
                     print("breath attack")
                     print(selector)
+                    message = message+getlore("breath")
                     for i in selector:
                         staggered = roll(2)
                         if staggered == 2:
@@ -964,6 +995,7 @@ async def game_process():
             else:
                 res = bot.current_raid.burn()
                 print("Burned", res)
+                message =message + getlore("breath")
                 message = message + "The dragon uses it's breath on the village and deals " + str(res[0]) + " damage. " + str(bot.current_raid.vhp) + " hp remains\n"
             for i in bot.current_raiders:
                 bot.current_raiders[i].staggered = min(2, bot.current_raiders[i].staggered + 2)
@@ -974,10 +1006,8 @@ async def game_process():
         message = message + "The dragon did nothing due to your action \n"
 
     print("__________________")
-    mult = 1
-    if bot.current_raid.effect == "vulnerable":
-        mult = 1.5
-    bot.current_raid.bhp -= mult*damage
+
+    bot.current_raid.bhp -= damage
     if bot.current_raid.bhp<0:
         bot.current_raid.bhp = 0
     message = message + "The dragon has " + str(bot.current_raid.bhp) + " HP\n"
