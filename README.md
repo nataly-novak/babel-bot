@@ -1,3 +1,7 @@
+## THIS VERSION OF BABEL IS NO LONGER DEVELOPED. GO TO THE KNIGHTS OF ACADEMIA REPO!
+
+
+
 # koai-bot
 This is the bot for Knights of Academia: International
 
