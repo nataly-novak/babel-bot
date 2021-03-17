@@ -1,5 +1,9 @@
-# koai-bot
-This is the bot for Knights of Academia: International
+## THIS VERSION OF BABEL IS NO LONGER DEVELOPED. THE ORGANISATION ALSO DROPPED IT.
+
+
+
+
+This is the bot for _honestly anyone who needs it_
 
 You can pin and unpin the messages in accountability channel by reacting with
 pin emoji.
@@ -31,7 +35,7 @@ Joining allows you to be mentioned after the raid is done
 /break initializes the break timer. Bed emoji allows you to join the break Zzz emoji
 starts the break.
 
-/invite prints KOAI invite link. Print /invite koa to get KOA invitation
+/invite prints invite link. Add whatever links you want.
 
 /coin flips a coin for you
 

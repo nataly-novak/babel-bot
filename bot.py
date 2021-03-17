@@ -208,12 +208,12 @@ async def delfunction(ctx, function):
     await ctx.message.delete()
 
 
-@bot.command(name='invite',help='prints koai invite',pass_context=True)
-async def invite(ctx, invite = "koai"):
-    if invite == "koai":
-        message = "Want to invite a friend? Use this link: \n https://discord.gg/Fuvabsm"
-    elif invite == "koa":
-        message = "Do you want to join Knights of Academia, too? Use this link: \n https://discord.gg/EYX7XGG"
+@bot.command(name='invite',help='prints the invite you need',pass_context=True)
+async def invite(ctx, invite = "default"):
+    if invite == "default":
+        message = "Want to invite a friend? Use this link: "
+    elif invite == "partner":
+        message = "Do you want to join the partner server, too? Use this link: "
     await ctx.message.delete()
     await ctx.send(message)
 
@@ -320,7 +320,7 @@ async def local(ctx, date, time, zone):
     else:
         await ctx.message.delete()
 
-@bot.command(name='info',help='gives info on essential KOAI concepts',pass_context=True)
+@bot.command(name='info',help='gives info on essential concepts',pass_context=True)
 async def raid(ctx, theme = ""):
     message = help(help_items, theme)
     await ctx.message.delete()
